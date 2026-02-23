@@ -1,0 +1,58 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: Arial, sans-serif;
+  background-color: #e8f4ff;
+  background-image:
+    repeating-conic-gradient(
+      from 45deg at 14px 14px,
+      rgba(18, 75, 132, 0.14) 0 25%,
+      transparent 0 50%
+    );
+  background-size: 28px 28px;
+  color: #0d2238;
+}
+
+.page {
+  width: 100%;
+  padding: 16px;
+}
+
+.stopwatch {
+  width: min(380px, 100%);
+  margin: 0 auto;
+  border: 1px solid #2b6ca3;
+  background: #cde7fa;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 16px;
+}
+
+.time-display {
+  margin: 0 0 16px;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+button {
+  padding: 8px 14px;
+  border: 1px solid #2b6ca3;
+  background: #f7fcff;
+  color: #0d2238;
+  cursor: pointer;
+}

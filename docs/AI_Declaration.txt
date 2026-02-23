@@ -1,0 +1,61 @@
+============================================================
+           AI USAGE DECLARATION
+============================================================
+
+Name: Md. Sameer Sakib
+Student ID: 24241344
+Assignment: 02
+Date: 22/02/2026
+
+------------------------------------------------------------
+1. AI TOOLS USED (check all that apply)
+------------------------------------------------------------
+[ ] None
+[ ] ChatGPT
+[Y] GitHub Copilot
+[ ] Google Gemini
+[ ] Claude
+[ ] Cursor
+[ ] Other: ________________
+
+------------------------------------------------------------
+2. PURPOSE OF AI USE (check all that apply)
+------------------------------------------------------------
+[ ] Learning/understanding concepts
+[ ] Debugging my code
+[ ] Generating code snippets
+[ ] Writing text content
+[Y] Design/styling ideas
+[ ] Image generation
+[ ] Other: ________________
+
+------------------------------------------------------------
+3. DESCRIPTION OF AI USE
+------------------------------------------------------------
+Briefly describe what you used AI for and how:
+Assisted with background Pattern Generation. 
+------------------------------------------------------------
+4. AI-ASSISTED SECTIONS
+------------------------------------------------------------
+List specific files/sections where AI helped significantly:
+
+File: Fortune Generator\style.css Section: Line [11-24, 101-102]
+File: Stopwatch\style.css         Section: Line [11-19, 30-31, 54-56]
+File: To-Do List\style.css        Section: Line [11-23, 101-102]
+
+------------------------------------------------------------
+5. DECLARATION
+------------------------------------------------------------
+I declare that:
+- This disclosure is complete and accurate
+- I understand all code in my submission
+- I can explain and modify my work if asked
+- I take full responsibility for my submission
+
+Signature: Md. Sameer Sakib
+Date: 22/02/2026
+
+============================================================
+Save as: docs/AI_Declaration.txt
+============================================================
+

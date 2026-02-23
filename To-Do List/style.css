@@ -1,0 +1,97 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: Arial, sans-serif;
+  background-color: #f2d2bd;
+  background-image:
+    radial-gradient(circle at 2px 2px, rgba(122, 84, 47, 0.22) 1.2px, transparent 1.3px),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.2) 0,
+      rgba(255, 255, 255, 0.2) 8px,
+      transparent 8px,
+      transparent 16px
+    );
+  background-size: 18px 18px, 36px 36px;
+  color: #2b1c0f;
+}
+
+.page {
+  width: 100%;
+  padding: 16px;
+}
+
+.todo {
+  width: min(560px, 100%);
+  margin: 0 auto;
+  border: 1px solid #7a542f;
+  background: #c89a6b;
+  padding: 20px;
+}
+
+h1 {
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+#taskinput {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #7a542f;
+  background: #fff8dc;
+  color: #2b1c0f;
+}
+
+#addbutton {
+  padding: 8px 14px;
+  border: 1px solid #7a542f;
+  background: #ffe49a;
+  color: #2b1c0f;
+  cursor: pointer;
+}
+
+#tasklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#tasklist li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #b89b3f;
+  background: #fff4a8;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.text {
+  flex: 1;
+  word-break: break-word;
+}
+
+.done {
+  text-decoration: line-through;
+  color: #7a6a35;
+}
+
+.delbutton {
+  padding: 5px 10px;
+  border: 1px solid #7a542f;
+  background: #ffe49a;
+  color: #2b1c0f;
+  cursor: pointer;
+}
