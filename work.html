@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real Systems in Use — Md. Sameer Sakib</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0A0A0D;
+      --surface: #121218;
+      --surface-2: #1A1A22;
+      --border: rgba(244, 244, 240, 0.10);
+      --text: #F4F4F0;
+      --muted: #9494A0;
+      --accent: #FF6B4A;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Google Sans', system-ui, sans-serif;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .soft-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+    .soft-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="border-b border-white/10 py-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <a href="index.html" class="font-mono text-xs uppercase tracking-widest text-[#9494A0] hover:text-white transition">
+        ← Back to Home
+      </a>
+      <span class="font-mono text-xs uppercase tracking-widest text-[#FF6B4A]">Selected Work</span>
+    </div>
+  </header>
+
+  <main class="py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <h1 class="font-bold text-3xl sm:text-5xl tracking-tight">Real systems in use.</h1>
+        <div class="inline-flex flex-wrap gap-2">
+          <button type="button" data-work-filter="all" class="work-filter-btn px-4 py-2 rounded-full border border-white/10 font-mono text-xs uppercase tracking-wider bg-[#FF6B4A] text-[#0A0A0D] font-medium cursor-pointer">All (6)</button>
+          <button type="button" data-work-filter="systems" class="work-filter-btn px-4 py-2 rounded-full border border-white/10 bg-[#121218] font-mono text-xs uppercase tracking-wider text-[#9494A0] cursor-pointer">Business Systems</button>
+          <button type="button" data-work-filter="products" class="work-filter-btn px-4 py-2 rounded-full border border-white/10 bg-[#121218] font-mono text-xs uppercase tracking-wider text-[#9494A0] cursor-pointer">Apps &amp; Tools</button>
+        </div>
+      </div>
+
+      <div id="workGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </div>
+  </main>
+
+  <script>
+    const PROJECTS = [
+      { id: 'business-crm', group: 'systems', year: '2025 — Present', title: 'Business CRM & POS System', short: 'Live retail CRM & POS running across multiple stores in Bangladesh.', stack: ['Next.js', 'Supabase', 'RBAC', 'Courier API'], url: 'https://github.com/mdsameersakib', ctaLabel: 'GitHub Profile ↗' },
+      { id: 'dental-crm', group: 'systems', year: '2026', title: 'Dental CRM Platform', short: 'Clinic platform with online booking, staff CRM, and AI patient assistant.', stack: ['Next.js', 'TypeScript', 'Supabase', 'Gemini API'], url: 'https://github.com/mdsameersakib/dental-crm', ctaLabel: 'View Repository ↗' },
+      { id: 'poralikha', group: 'systems', year: '2024 — 2025', title: 'Poralikha Education Platform', short: 'Classroom, attendance, leave approval, and calendar system for schools.', stack: ['Next.js', 'React', 'Supabase RLS', 'ShadCN UI'], url: 'https://github.com/mdsameersakib/poralikha-website', ctaLabel: 'View Repository ↗' },
+      { id: 'amartaka', group: 'products', year: '2025', title: 'AmarTaka — Finance App', short: 'Fast, offline-first personal expense tracker with multi-wallet charts.', stack: ['Next.js', 'TypeScript', 'PWA', 'Tailwind CSS'], url: 'https://github.com/mdsameersakib/AmarTaka', ctaLabel: 'View Repository ↗' },
+      { id: 'bongshobrikkho', group: 'products', year: '2023', title: 'Bongshobrikkho Family Tree', short: 'Interactive family tree builder and shared photo archive.', stack: ['React', 'React Flow', 'Zustand', 'Firestore'], url: 'https://github.com/mdsameersakib/Bongshobrikkho', ctaLabel: 'View Repository ↗' },
+      { id: 'antigravity-cli', group: 'products', year: '2026', title: 'Antigravity CLI Usage Stats', short: 'VS Code extension showing live CLI usage limits in the status bar.', stack: ['VS Code API', 'TypeScript', '35+ Installs'], url: 'https://marketplace.visualstudio.com/items?itemName=mdsameersakib.antigravitycli-usage-stats', ctaLabel: 'VS Marketplace ↗' },
+    ];
+
+    let activeFilter = 'all';
+    function render() {
+      const grid = document.getElementById('workGrid');
+      const items = activeFilter === 'all' ? PROJECTS : PROJECTS.filter(p => p.group === activeFilter);
+      grid.innerHTML = items.map(p => `
+        <a href="${p.url}" target="_blank" rel="noopener" class="soft-card p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-xs uppercase tracking-widest text-[#9494A0]">${p.year}</span>
+              <span class="font-mono text-xs font-medium text-[#FF6B4A]">${p.ctaLabel}</span>
+            </div>
+            <h3 class="mt-3 font-bold text-xl">${p.title}</h3>
+            <p class="mt-2 text-sm text-[#9494A0] leading-relaxed">${p.short}</p>
+          </div>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            ${p.stack.map(st => `<span class="px-3 py-1 rounded-full bg-[#1A1A22] border border-white/10 font-mono text-xs">${st}</span>`).join('')}
+          </div>
+        </a>
+      `).join('');
+    }
+    document.querySelectorAll('.work-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.workFilter;
+        document.querySelectorAll('.work-filter-btn').forEach(b => {
+          b.className = 'work-filter-btn px-4 py-2 rounded-full border border-white/10 bg-[#121218] font-mono text-xs uppercase tracking-wider text-[#9494A0] cursor-pointer';
+        });
+        btn.className = 'work-filter-btn px-4 py-2 rounded-full border border-white/10 font-mono text-xs uppercase tracking-wider bg-[#FF6B4A] text-[#0A0A0D] font-medium cursor-pointer';
+        render();
+      });
+    });
+    render();
+  </script>
+</body>
+</html>

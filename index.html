@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Md. Sameer Sakib — Software Engineering & Performance Marketing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Google Sans', 'sans-serif'],
+            sans: ['Google Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --bg: #09090B;
+      --surface: #131318;
+      --surface-2: #1A1A22;
+      --text: #F4F4F0;
+      --muted: #9494A0;
+      --border: rgba(244, 244, 240, 0.11);
+      --grid-line: rgba(244, 244, 240, 0.015);
+      --nav-bg: rgba(9, 9, 11, 0.76);
+      --accent: #FF6B4A;
+      --accent-text: #FF8566;
+      --accent-ink: #09090B;
+      --accent-soft: rgba(255, 107, 74, 0.14);
+      --accent-glow: rgba(255, 107, 74, 0.22);
+      --emerald: #10B981;
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] {
+      --bg: #F6F6F2;
+      --surface: #FFFFFF;
+      --surface-2: #ECECE6;
+      --text: #111115;
+      --muted: #5C5C68;
+      --border: rgba(17, 17, 21, 0.11);
+      --grid-line: rgba(17, 17, 21, 0.02);
+      --nav-bg: rgba(246, 246, 242, 0.8);
+      --accent: #E04F2E;
+      --accent-text: #D64120;
+      --accent-ink: #FFFFFF;
+      --accent-soft: rgba(224, 79, 46, 0.11);
+      --accent-glow: rgba(224, 79, 46, 0.18);
+      color-scheme: light;
+    }
+
+    /* View Transitions Circle Ripple */
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+    ::view-transition-new(root) {
+      z-index: 9999;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Google Sans', sans-serif;
+      font-size: 16px;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    .theme-bg { background-color: var(--bg); }
+    .theme-surface { background-color: var(--surface); }
+    .theme-surface-2 { background-color: var(--surface-2); }
+    .theme-text { color: var(--text); }
+    .theme-muted { color: var(--muted); }
+    .theme-border { border-color: var(--border); }
+    .theme-accent { background-color: var(--accent); color: var(--accent-ink); }
+    .theme-accent-text { color: var(--accent-text); }
+    .theme-accent-soft { background-color: var(--accent-soft); }
+
+    .glass-nav {
+      background: var(--nav-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .grid-bg {
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    .cursor-glow {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 420px;
+      height: 420px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 68%);
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      transition: opacity 0.35s ease;
+    }
+    @media (hover: none) {
+      .cursor-glow { display: none; }
+    }
+
+    .soft-card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.75rem;
+      transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+    }
+    .soft-card:hover {
+      border-color: var(--accent-text);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 45px -20px var(--accent-glow);
+    }
+
+    .chip-active {
+      background-color: var(--accent) !important;
+      color: var(--accent-ink) !important;
+      border-color: var(--accent) !important;
+    }
+
+    .line-mask, .word-mask {
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: bottom;
+    }
+    .word-inner {
+      display: inline-block;
+      will-change: transform;
+    }
+    .swap-slot {
+      position: relative;
+      display: inline-block;
+      vertical-align: top;
+      text-align: left;
+      overflow: hidden;
+      height: 1.14em;
+      line-height: 1.14;
+    }
+    .swap-word {
+      position: absolute;
+      left: 0;
+      top: -0.074em;
+      white-space: nowrap;
+      line-height: 1.14;
+      will-change: transform, opacity;
+    }
+    .swap-b,
+    .swap-c {
+      opacity: 0;
+    }
+
+    #scrollProgress {
+      background-color: var(--accent);
+      transform-origin: left center;
+      transform: scaleX(0);
+    }
+
+    /* Orbital Hero Visual */
+    .orb-wrap {
+      position: relative;
+      width: 290px;
+      height: 290px;
+      perspective: 950px;
+      transform-style: preserve-3d;
+    }
+    @media (min-width: 1024px) {
+      .orb-wrap { width: 350px; height: 350px; }
+    }
+    .orbit-svg {
+      position: absolute;
+      left: -25%;
+      top: -25%;
+      width: 150%;
+      height: 150%;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .orbit-svg-back {
+      z-index: 1;
+    }
+    .orbit-svg-front {
+      z-index: 3;
+    }
+    .orbit-logo {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 40px;
+      height: 40px;
+      margin-left: -20px;
+      margin-top: -20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.38));
+      will-change: transform, opacity;
+      pointer-events: auto;
+    }
+    @media (min-width: 1024px) {
+      .orbit-logo { width: 44px; height: 44px; margin-left: -22px; margin-top: -22px; }
+    }
+    .metric-item {
+      border-top: 1px solid var(--border);
+      transition: border-color 0.25s ease;
+    }
+    .metric-item:hover {
+      border-top-color: var(--accent);
+    }
+    .metric-item .metric-title {
+      color: var(--text);
+      transition: color 0.25s ease;
+    }
+    .metric-item:hover .metric-title {
+      color: var(--accent);
+    }
+    .orb-core {
+      position: absolute;
+      inset: 6%;
+      border-radius: 9999px;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      z-index: 2;
+    }
+    #avatarCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 9999px;
+      cursor: grab;
+    }
+    #avatarCanvas:active {
+      cursor: grabbing;
+    }
+    .orb-float-badge {
+      transform: translateZ(52px);
+    }
+
+    /* Placeholder badge pulse */
+    .placeholder-tag {
+      border: 1px dashed var(--accent-text);
+      background: var(--accent-soft);
+      color: var(--accent-text);
+    }
+
+    /* Theme button hover animation */
+    #themeToggleBtn:hover .theme-icon {
+      transform: rotate(35deg) scale(1.12);
+    }
+    .theme-icon {
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Fallback Ripple Overlay */
+    #rippleOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      clip-path: circle(0px at 50% 50%);
+      opacity: 0;
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <!-- Scroll Progress Bar -->
+  <div id="scrollProgress" class="fixed top-0 left-0 right-0 h-[3px] z-50 pointer-events-none rounded-r-full"></div>
+
+  <!-- Cursor Spotlight -->
+  <div id="cursorGlow" class="cursor-glow opacity-0"></div>
+
+  <!-- Fallback Theme Ripple Layer -->
+  <div id="rippleOverlay"></div>
+
+  <!-- Top Navigation -->
+  <header class="fixed top-0 inset-x-0 z-40 glass-nav border-b theme-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="#top" class="flex items-center gap-2.5 group">
+        <span class="w-3 h-3 rounded-full theme-accent group-hover:scale-125 transition-transform"></span>
+        <span class="font-display font-bold tracking-tight text-sm sm:text-base theme-text">SAMEER SAKIB</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-7 text-xs font-mono uppercase tracking-widest theme-muted">
+        <a href="#results" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Results</a>
+        <a href="work.html" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Work</a>
+        <a href="#services" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Services</a>
+        <a href="#quote" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Quote</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <!-- Dark / Light Switcher with Hover Animation -->
+        <button id="themeToggleBtn" type="button" aria-label="Toggle Dark or Light Mode" class="w-10 h-10 rounded-full border theme-border theme-surface flex items-center justify-center theme-text hover:scale-105 transition-all">
+          <svg id="sunIcon" class="theme-icon w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg id="moonIcon" class="theme-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <a href="#quote" class="magnetic-btn hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full theme-accent font-mono text-xs font-medium uppercase tracking-wider hover:opacity-90 transition-opacity">
+          Start a Project
+          <span aria-hidden="true">↗</span>
+        </a>
+
+        <button id="mobileMenuBtn" type="button" aria-label="Toggle Menu" class="md:hidden p-2.5 rounded-full border theme-border theme-text">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileMenu" class="hidden md:hidden border-t theme-border theme-bg px-5 py-4 space-y-3 rounded-b-3xl">
+      <a href="#results" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-muted">Results</a>
+      <a href="work.html" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-muted">Work</a>
+      <a href="#services" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-muted">Services</a>
+      <a href="#quote" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-accent-text">Start a Project ↗</a>
+    </div>
+  </header>
+
+  <main id="top" class="relative z-10">
+    <!-- HERO -->
+    <section id="heroSection" class="relative min-h-[94vh] pt-24 pb-10 flex flex-col justify-between grid-bg border-b theme-border overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto relative z-10">
+        <div class="relative flex flex-col items-center text-center pt-2">
+          <!-- Giant Editorial Backdrop Name -->
+          <div aria-hidden="true" class="pointer-events-none select-none absolute top-24 sm:top-20 lg:top-24 left-1/2 -translate-x-1/2 w-full text-center font-display font-extrabold uppercase tracking-tighter text-[3rem] sm:text-[6rem] lg:text-[8.75rem] leading-[0.9] theme-accent-text opacity-[0.12] whitespace-nowrap">
+            Md. Sameer Sakib
+          </div>
+
+          <!-- Center 3D Character Orbital Visual -->
+          <div class="relative z-10 flex justify-center">
+            <div id="heroOrb" class="orb-wrap hero-stagger">
+              <!-- 3D Orbital Rings: Back Arcs (behind avatar, dimmer & thinner) -->
+              <svg class="orbit-svg orbit-svg-back" viewBox="-250 -250 500 500" fill="none" aria-hidden="true">
+                <g transform="rotate(-28)">
+                  <path d="M -216.67 0 A 216.67 81.16 0 0 1 216.67 0" stroke="var(--border)" stroke-width="0.6" stroke-opacity="0.45" />
+                </g>
+                <g transform="rotate(28)">
+                  <path d="M -216.67 0 A 216.67 81.16 0 0 1 216.67 0" stroke="var(--border)" stroke-width="0.6" stroke-opacity="0.45" />
+                </g>
+              </svg>
+
+              <!-- 3D Orbital Rings: Front Arcs (in front of avatar, brighter & thicker) -->
+              <svg class="orbit-svg orbit-svg-front" viewBox="-250 -250 500 500" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="orbitFrontGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="var(--border)" stop-opacity="0.25" />
+                    <stop offset="50%" stop-color="var(--accent)" stop-opacity="0.75" />
+                    <stop offset="100%" stop-color="var(--border)" stop-opacity="0.25" />
+                  </linearGradient>
+                </defs>
+                <g transform="rotate(-28)">
+                  <path d="M 216.67 0 A 216.67 81.16 0 0 1 -216.67 0" stroke="url(#orbitFrontGrad)" stroke-width="1.0" stroke-linecap="round" />
+                </g>
+                <g transform="rotate(28)">
+                  <path d="M 216.67 0 A 216.67 81.16 0 0 1 -216.67 0" stroke="url(#orbitFrontGrad)" stroke-width="1.0" stroke-linecap="round" />
+                </g>
+              </svg>
+
+              <!-- Orbit Ring A (-28deg): Meta, Google Ads, TikTok -->
+              <div class="orbit-logo" data-ring="a" data-angle="0" title="Meta Ads">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" aria-label="Meta">
+                  <defs>
+                    <linearGradient id="metaGrad" x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#0081FB" />
+                      <stop offset="50%" stop-color="#0064E0" />
+                      <stop offset="100%" stop-color="#0081FB" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M12 12C9.8 8.2 7.6 6.8 5.8 6.8C3.4 6.8 2 9.4 2 13C2 15.8 3.4 17.5 5.4 17.5C7.4 17.5 9.5 15.6 12 12C14.5 8.4 16.6 6.8 18.2 6.8C20.6 6.8 22 9.4 22 13C22 15.8 20.6 17.5 18.6 17.5C16.6 17.5 14.2 15.8 12 12Z" stroke="url(#metaGrad)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="orbit-logo" data-ring="a" data-angle="120" title="Google Ads">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-label="Google Ads">
+                  <path d="M14.2 4.3L6.2 18.2a2.2 2.2 0 0 1-3.8-2.2L10.4 2.1a2.2 2.2 0 0 1 3.8 2.2z" fill="#FBBC04"/>
+                  <path d="M21.6 16a2.2 2.2 0 0 1-3.8 2.2L9.8 4.3a2.2 2.2 0 1 1 3.8-2.2L21.6 16z" fill="#4285F4"/>
+                  <circle cx="4.3" cy="17.1" r="2.2" fill="#34A853"/>
+                </svg>
+              </div>
+              <div class="orbit-logo" data-ring="a" data-angle="240" title="TikTok Ads">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-label="TikTok">
+                  <path d="M15.8 3.5c.6 2.1 2.1 3.6 4.2 4v3a7.2 7.2 0 0 1-4.2-1.4v6.4a5.2 5.2 0 1 1-4.5-5.1v3.1a2.2 2.2 0 1 0 1.5 2.1V3.5h3z" fill="#25F4EE" transform="translate(-0.7,-0.5)"/>
+                  <path d="M15.8 3.5c.6 2.1 2.1 3.6 4.2 4v3a7.2 7.2 0 0 1-4.2-1.4v6.4a5.2 5.2 0 1 1-4.5-5.1v3.1a2.2 2.2 0 1 0 1.5 2.1V3.5h3z" fill="#FE2C55" transform="translate(0.7,0.5)"/>
+                  <path d="M15.8 3.5c.6 2.1 2.1 3.6 4.2 4v3a7.2 7.2 0 0 1-4.2-1.4v6.4a5.2 5.2 0 1 1-4.5-5.1v3.1a2.2 2.2 0 1 0 1.5 2.1V3.5h3z" fill="currentColor"/>
+                </svg>
+              </div>
+
+              <!-- Orbit Ring B (+28deg): WordPress, Shopify, Next.js -->
+              <div class="orbit-logo" data-ring="b" data-angle="60" title="WordPress">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-label="WordPress">
+                  <circle cx="12" cy="12" r="9.5" stroke="#21759B" stroke-width="1.8"/>
+                  <path d="M5.2 8.8l3.2 8.8 2.4-6.4 2.4 6.4 3.1-8.8" stroke="#21759B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="orbit-logo" data-ring="b" data-angle="180" title="Shopify">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" aria-label="Shopify">
+                  <path d="M18.6 6.8l-1.5-.3s-.5-2.5-2.6-2.5c-.2 0-.4 0-.6.1-.4-.5-.9-.8-1.5-.8-2.2 0-3.3 2.7-3.6 4.1l-2.6.8c-.8.2-.8.3-.9 1.1L3.8 19.6 15.8 21.8l5-1.2-2.2-13.8z" fill="#95BF47"/>
+                  <path d="M13.5 11.2c-.4-.2-1-.4-1.6-.4-.9 0-1.3.4-1.3.8 0 .5.7.7 1.4 1.1 1 .5 1.4 1.1 1.4 2 0 1.4-1.1 2.3-2.7 2.3-.9 0-1.8-.3-2.3-.6l.4-1.2c.5.3 1.2.5 1.8.5.7 0 1.2-.3 1.2-.8 0-.4-.3-.7-1.2-1.1-1-.5-1.6-1-1.6-2 0-1.2 1-2.2 2.7-2.2.8 0 1.5.2 1.9.4l-.1 1.2z" fill="#fff"/>
+                </svg>
+              </div>
+              <div class="orbit-logo" data-ring="b" data-angle="300" title="Next.js">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-label="Next.js">
+                  <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.8"/>
+                  <path d="M8.5 16V8.5l8.8 10.7M15.5 8.5v4.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="orb-core">
+                <canvas id="avatarCanvas" aria-label="Interactive 3D character of Md. Sameer Sakib"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Centered Headline & Copy (keeps swap animation + synced blink) -->
+          <div class="mt-8 relative z-10 flex flex-col items-center">
+            <h1 class="font-display font-extrabold tracking-tight text-3xl sm:text-5xl lg:text-[4.25rem] leading-[1.14] theme-text">
+              <span class="sr-only">I Build Your Software, Scale Your Brand, and Run Your Ads</span>
+              <span aria-hidden="true" class="line-mask block">
+                <span class="hero-line block"><span class="inline-block align-top">I</span> <span id="swapSlot1" class="swap-slot"><span class="swap-word swap-a">Build</span><span class="swap-word swap-b">Scale</span><span class="swap-word swap-c">Run</span></span></span>
+              </span>
+              <span aria-hidden="true" class="line-mask block">
+                <span class="hero-line block"><span class="inline-block align-top">Your</span> <span id="swapSlot2" class="swap-slot font-bold theme-accent-text"><span class="swap-word swap-a">Software</span><span class="swap-word swap-b">Brand</span><span class="swap-word swap-c">Ads</span></span></span>
+              </span>
+            </h1>
+
+            <p class="hero-stagger mt-4 max-w-xl mx-auto text-base sm:text-lg theme-muted leading-relaxed">
+              I build your website or software, set up tracking, and run your ads—all in one place.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Editorial Hairline Index -->
+      <div id="heroMetrics" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-10 relative z-10">
+        <div class="hero-stagger grid grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+          <div class="metric-item pt-4 cursor-default">
+            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+              <span>Software &amp; Apps</span>
+              <span class="font-mono theme-accent-text opacity-100">01</span>
+            </div>
+            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Websites, CRM &amp; POS</div>
+          </div>
+          <div class="metric-item pt-4 cursor-default">
+            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+              <span>Paid Ads</span>
+              <span class="font-mono theme-accent-text opacity-100">02</span>
+            </div>
+            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Meta · Google · TikTok</div>
+          </div>
+          <div class="metric-item pt-4 cursor-default">
+            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+              <span>Ad Tracking</span>
+              <span class="font-mono theme-accent-text opacity-100">03</span>
+            </div>
+            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Pixel &amp; CAPI Setup</div>
+          </div>
+          <div class="metric-item pt-4 cursor-default">
+            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+              <span>Existing Sites</span>
+              <span class="font-mono theme-accent-text opacity-100">04</span>
+            </div>
+            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Upgrade Without Rebuilding</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 / THE BIG PICTURE -->
+    <section id="big-picture" class="py-24 sm:py-32 border-b theme-border relative overflow-hidden">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+        <h2 class="scroll-fade font-display font-bold text-3xl sm:text-5xl lg:text-[3.25rem] tracking-tight leading-[1.1] theme-text">
+          Most businesses don't need<br />
+          another agency.<br />
+          They just need everything to work<br />
+          <span class="theme-accent-text">Simply and Efficiently.</span>
+        </h2>
+
+        <p class="scroll-fade mt-6 max-w-2xl text-base sm:text-xl theme-muted leading-relaxed">
+          I connect the technology behind your business with the marketing that brings people to it — from the first ad click to the systems that keep customers moving.
+        </p>
+
+        <!-- Connected 3-Step Flow -->
+        <div class="scroll-fade mt-10 w-full max-w-2xl grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="metric-item pt-3 text-center">
+            <div class="font-mono text-[11px] uppercase tracking-widest theme-accent-text">First Click</div>
+            <div class="metric-title mt-1 font-display font-bold text-sm sm:text-base">Targeted Paid Ads</div>
+          </div>
+          <div class="metric-item pt-3 text-center">
+            <div class="font-mono text-[11px] uppercase tracking-widest theme-accent-text">Conversion</div>
+            <div class="metric-title mt-1 font-display font-bold text-sm sm:text-base">Fast Sites &amp; Stores</div>
+          </div>
+          <div class="metric-item pt-3 text-center">
+            <div class="font-mono text-[11px] uppercase tracking-widest theme-accent-text">Retention</div>
+            <div class="metric-title mt-1 font-display font-bold text-sm sm:text-base">Tracking &amp; CRM Flow</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="services" class="py-20 sm:py-24 border-b theme-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto">
+          <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight theme-text">
+            What I can do for you.
+          </h2>
+          <p class="scroll-fade mt-3 text-base sm:text-lg theme-muted leading-relaxed">
+            Custom-built software and performance marketing, handled in one place.
+          </p>
+        </div>
+
+        <div class="mt-14 grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <!-- Track 1: Software & Web -->
+          <div class="scroll-fade">
+            <div class="pb-3">
+              <span class="font-mono text-xs uppercase tracking-widest theme-accent-text">Software &amp; Web</span>
+            </div>
+            <div class="space-y-6">
+              <div class="metric-item pt-5 cursor-default">
+                <h3 class="metric-title font-display font-bold text-xl">Bespoke Websites &amp; Online Stores</h3>
+                <p class="mt-1.5 text-sm sm:text-base theme-muted leading-relaxed">
+                  Custom websites, landing pages, and e-commerce stores built from scratch for speed and conversions.
+                </p>
+              </div>
+              <div class="metric-item pt-5 cursor-default">
+                <h3 class="metric-title font-display font-bold text-xl">Custom Business Software (Buy or SaaS)</h3>
+                <p class="mt-1.5 text-sm sm:text-base theme-muted leading-relaxed">
+                  Tailored CRM, ERP, HR, POS, or internal tools built around your workflow—own it outright or subscribe as SaaS <span class="opacity-75">(conditions apply)</span>.
+                </p>
+              </div>
+              <div class="metric-item pt-5 cursor-default">
+                <h3 class="metric-title font-display font-bold text-xl">Site Upgrades &amp; New Features</h3>
+                <p class="mt-1.5 text-sm sm:text-base theme-muted leading-relaxed">
+                  Already have a website? I can improve the UI, fix performance, or add new features without a full rebuild.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Track 2: Ads & Growth -->
+          <div class="scroll-fade">
+            <div class="pb-3">
+              <span class="font-mono text-xs uppercase tracking-widest theme-accent-text">Ads &amp; Growth</span>
+            </div>
+            <div class="space-y-6">
+              <div class="metric-item pt-5 cursor-default">
+                <h3 class="metric-title font-display font-bold text-xl">Meta, Google &amp; TikTok Ads</h3>
+                <p class="mt-1.5 text-sm sm:text-base theme-muted leading-relaxed">
+                  Campaigns structured, tested, and managed daily to bring in qualified leads and profitable orders.
+                </p>
+              </div>
+              <div class="metric-item pt-5 cursor-default">
+                <h3 class="metric-title font-display font-bold text-xl">Pixel, CAPI &amp; Conversion Tracking</h3>
+                <p class="mt-1.5 text-sm sm:text-base theme-muted leading-relaxed">
+                  Accurate browser and server-side tracking so ad platforms see every real purchase and lead.
+                </p>
+              </div>
+              <div class="metric-item pt-5 cursor-default">
+                <h3 class="metric-title font-display font-bold text-xl">Creative Testing &amp; Ongoing Scaling</h3>
+                <p class="mt-1.5 text-sm sm:text-base theme-muted leading-relaxed">
+                  Continuous ad creative iteration, funnel tweaks, and clear weekly reporting as your budget grows.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clean Hairline Upgrade Strip -->
+        <div class="scroll-fade metric-item mt-14 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <p class="text-sm theme-muted leading-relaxed">
+            <strong class="theme-text">Already have a website or ad account?</strong> I can plug in right away to fix tracking, run ads, or ship new features.
+          </p>
+          <a href="#quote" class="shrink-0 px-5 py-2.5 rounded-full theme-surface border theme-border font-mono text-xs uppercase tracking-wider theme-text hover:border-[var(--accent)] transition">
+            Upgrade Existing ↗
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 / RESULTS & GROWTH LOOP -->
+    <section id="results" class="py-20 sm:py-24 border-b theme-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <!-- Left: Editorial Summary & 4-Step Hairline Loop (Variation A) -->
+          <div class="lg:col-span-5">
+            <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight leading-[1.06] theme-text">
+              Every dollar tracked. <span class="theme-accent-text">Every click accounted for.</span>
+            </h2>
+            <p class="scroll-fade mt-4 text-base theme-muted leading-relaxed">
+              When your site, tracking, and ad accounts are built by one person, nothing gets lost in handoffs—and revenue is easy to prove.
+            </p>
+
+            <div class="scroll-fade mt-8 space-y-4">
+              <div class="metric-item pt-3 flex items-center justify-between gap-4 cursor-default">
+                <span class="font-mono text-xs theme-accent-text shrink-0">01 · ACQUISITION</span>
+                <span class="metric-title text-sm font-medium text-right">Meta, Google &amp; TikTok Campaigns</span>
+              </div>
+              <div class="metric-item pt-3 flex items-center justify-between gap-4 cursor-default">
+                <span class="font-mono text-xs theme-accent-text shrink-0">02 · CONVERSION</span>
+                <span class="metric-title text-sm font-medium text-right">Sub-Second Pages &amp; Clean Checkouts</span>
+              </div>
+              <div class="metric-item pt-3 flex items-center justify-between gap-4 cursor-default">
+                <span class="font-mono text-xs theme-accent-text shrink-0">03 · ATTRIBUTION</span>
+                <span class="metric-title text-sm font-medium text-right">Server-Side Pixel, CAPI &amp; GA4</span>
+              </div>
+              <div class="metric-item pt-3 flex items-center justify-between gap-4 cursor-default">
+                <span class="font-mono text-xs theme-accent-text shrink-0">04 · SCALE</span>
+                <span class="metric-title text-sm font-medium text-right">Creative Iteration &amp; Budget Scaling</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Horizontal Row Ledger (Variation C) -->
+          <div class="lg:col-span-7">
+            <div class="result-card metric-item py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-default">
+              <div class="metric-title font-display font-bold text-4xl sm:text-5xl tracking-tight shrink-0">[X.Xx ROAS]</div>
+              <div class="sm:text-right max-w-xs">
+                <div class="font-mono text-xs uppercase tracking-wider theme-accent-text">[Brand / Niche]</div>
+                <p class="text-sm theme-muted mt-1">Scaled monthly ad spend while lowering cost per order.</p>
+              </div>
+            </div>
+            <div class="result-card metric-item py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-default">
+              <div class="metric-title font-display font-bold text-4xl sm:text-5xl tracking-tight shrink-0">[$XXK+ Spend]</div>
+              <div class="sm:text-right max-w-xs">
+                <div class="font-mono text-xs uppercase tracking-wider theme-accent-text">[Ad Spend Managed]</div>
+                <p class="text-sm theme-muted mt-1">Managed across local and international growth campaigns.</p>
+              </div>
+            </div>
+            <div class="result-card metric-item py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-default">
+              <div class="metric-title font-display font-bold text-4xl sm:text-5xl tracking-tight shrink-0">[+XX% Sales]</div>
+              <div class="sm:text-right max-w-xs">
+                <div class="font-mono text-xs uppercase tracking-wider theme-accent-text">[Store / Page Lift]</div>
+                <p class="text-sm theme-muted mt-1">Higher checkout completion after redesign &amp; CAPI fix.</p>
+              </div>
+            </div>
+            <div class="result-card metric-item pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-default">
+              <div class="text-base sm:text-lg font-medium theme-text">“[Short quote from a client]”</div>
+              <div class="shrink-0 font-mono text-xs theme-accent-text">— [Client Name, Brand]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY WORK WITH ME -->
+    <section id="why-me" class="py-20 sm:py-28 border-b theme-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto">
+          <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight leading-[1.08] theme-text">
+            One dedicated specialist. <span class="theme-accent-text">Zero agency runaround.</span>
+          </h2>
+          <p class="scroll-fade mt-4 text-base sm:text-lg theme-muted leading-relaxed">
+            I keep my client roster small on purpose. If we work together, you get my full loyalty and focus—and I expect the same in return.
+          </p>
+        </div>
+
+        <!-- 3 Polite Brutal Truths -->
+        <div class="scroll-fade mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="metric-item pt-5 cursor-default">
+            <h3 class="metric-title font-display font-bold text-xl">I don't take every client.</h3>
+            <p class="mt-2 text-sm sm:text-base theme-muted leading-relaxed">
+              I only partner with serious businesses looking for lasting growth—not one-off cheap fixes. Quality takes focus.
+            </p>
+          </div>
+          <div class="metric-item pt-5 cursor-default">
+            <h3 class="metric-title font-display font-bold text-xl">Loyalty goes both ways.</h3>
+            <p class="mt-2 text-sm sm:text-base theme-muted leading-relaxed">
+              You get tailored work crafted for your goals, proactive care, and a partner invested in your outcome. In return, I expect honesty and long-term loyalty.
+            </p>
+          </div>
+          <div class="metric-item pt-5 cursor-default">
+            <h3 class="metric-title font-display font-bold text-xl">Honesty before ad spend.</h3>
+            <p class="mt-2 text-sm sm:text-base theme-muted leading-relaxed">
+              If your offer, site, or pricing isn't ready for traffic, I'll tell you upfront instead of burning your budget just to bill a retainer.
+            </p>
+          </div>
+        </div>
+
+        <!-- Typical Agency vs. Working With Me Table (Google Sans) -->
+        <div class="scroll-fade mt-16">
+          <div class="hidden md:grid grid-cols-12 pb-3.5 text-sm font-semibold uppercase tracking-wider">
+            <div class="col-span-4 theme-muted">What Matters</div>
+            <div class="col-span-4 theme-muted">Typical Agency</div>
+            <div class="col-span-4 theme-accent-text">Working With Me</div>
+          </div>
+
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 items-baseline">
+            <div class="md:col-span-4 font-semibold text-lg theme-text">Who works on your account</div>
+            <div class="md:col-span-4 text-base theme-muted"><span class="md:hidden font-semibold theme-text">Agency: </span>Sold by seniors, handed off to junior managers</div>
+            <div class="md:col-span-4 text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>One person—I write the code and run the ads</div>
+          </div>
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 items-baseline">
+            <div class="md:col-span-4 font-semibold text-lg theme-text">When something breaks</div>
+            <div class="md:col-span-4 text-base theme-muted"><span class="md:hidden font-semibold theme-text">Agency: </span>Dev blames marketing; marketing blames tracking</div>
+            <div class="md:col-span-4 text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>Zero finger-pointing—I fix the full chain myself</div>
+          </div>
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 items-baseline">
+            <div class="md:col-span-4 font-semibold text-lg theme-text">Client capacity</div>
+            <div class="md:col-span-4 text-base theme-muted"><span class="md:hidden font-semibold theme-text">Agency: </span>20–40 clients per manager, rushed templates</div>
+            <div class="md:col-span-4 text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>Small selective roster, deep priority per brand</div>
+          </div>
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 items-baseline">
+            <div class="md:col-span-4 font-semibold text-lg theme-text">Reporting &amp; focus</div>
+            <div class="md:col-span-4 text-base theme-muted"><span class="md:hidden font-semibold theme-text">Agency: </span>Vanity slides full of clicks and impressions</div>
+            <div class="md:col-span-4 text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>Working systems and real tracked revenue</div>
+          </div>
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 items-baseline">
+            <div class="md:col-span-4 font-semibold text-lg theme-text">Ownership</div>
+            <div class="md:col-span-4 text-base theme-muted"><span class="md:hidden font-semibold theme-text">Agency: </span>Locked platforms and vendor dependencies</div>
+            <div class="md:col-span-4 text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>Your ad accounts, pixel data, and code stay yours</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESS TIMELINE -->
+    <section id="process" class="py-20 sm:py-28 border-b theme-border">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight theme-text">
+            Three simple steps.
+          </h2>
+          <p class="scroll-fade mt-3 text-base sm:text-lg theme-muted leading-relaxed">
+            From first conversation to live campaigns—clear milestones, zero guesswork.
+          </p>
+        </div>
+
+        <div class="hidden md:block relative h-px theme-surface-2 mb-10 overflow-hidden">
+          <div id="processLine" class="h-full theme-accent origin-left scale-x-0"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="process-card metric-item pt-5 cursor-default">
+            <div class="font-mono text-xs uppercase tracking-widest theme-accent-text">Step 01</div>
+            <h3 class="metric-title mt-3 font-display font-bold text-2xl">Agree on Goals</h3>
+            <p class="mt-2.5 text-sm sm:text-base theme-muted leading-relaxed">
+              New project or existing site—we pick what you need and lock in a clear scope and quote.
+            </p>
+          </div>
+
+          <div class="process-card metric-item pt-5 cursor-default">
+            <div class="font-mono text-xs uppercase tracking-widest theme-accent-text">Step 02</div>
+            <h3 class="metric-title mt-3 font-display font-bold text-2xl">Build &amp; Track</h3>
+            <p class="mt-2.5 text-sm sm:text-base theme-muted leading-relaxed">
+              I build your site or custom software and wire up clean Pixel, CAPI, and analytics tracking.
+            </p>
+          </div>
+
+          <div class="process-card metric-item pt-5 cursor-default">
+            <div class="font-mono text-xs uppercase tracking-widest theme-accent-text">Step 03</div>
+            <h3 class="metric-title mt-3 font-display font-bold text-2xl">Launch &amp; Grow</h3>
+            <p class="mt-2.5 text-sm sm:text-base theme-muted leading-relaxed">
+              Campaigns go live on Meta, Google, and TikTok with weekly optimization to scale sales.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 / INTERACTIVE QUOTE & CONTACT BUILDER -->
+    <section id="quote" class="py-20 sm:py-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+          <div class="lg:col-span-7 soft-card p-6 sm:p-8 reveal-block">
+            <h2 class="split-reveal font-display font-bold text-3xl sm:text-4xl tracking-tight theme-text">
+              Pick what you need.
+            </h2>
+            <p class="mt-2 text-sm theme-muted">
+              Tap your options to create a quick brief for email or WhatsApp.
+            </p>
+
+            <div class="mt-6">
+              <div class="font-mono text-[11px] uppercase tracking-widest theme-muted mb-3">Starting Point</div>
+              <div class="flex flex-wrap gap-2.5">
+                <button type="button" data-origin="Build from scratch" class="origin-chip chip-active px-4 py-2 rounded-full border theme-border font-mono text-xs transition-all">
+                  Build from Scratch
+                </button>
+                <button type="button" data-origin="Integrate into existing website / ad account" class="origin-chip px-4 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">
+                  Upgrade Existing Site / Ads
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <div class="font-mono text-[11px] uppercase tracking-widest theme-muted mb-3">Market</div>
+              <div class="flex flex-wrap gap-2.5">
+                <button type="button" data-market="Bangladesh" class="market-chip chip-active px-4 py-2 rounded-full border theme-border font-mono text-xs transition-all">
+                  Bangladesh
+                </button>
+                <button type="button" data-market="International" class="market-chip px-4 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">
+                  International
+                </button>
+                <button type="button" data-market="Both (BD & Global)" class="market-chip px-4 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">
+                  Both
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <div class="font-mono text-[11px] uppercase tracking-widest theme-muted mb-3">Services (Select Multiple)</div>
+              <div id="quoteServiceChips" class="flex flex-wrap gap-2">
+                <button type="button" data-qservice="Custom Web App / CRM / POS" class="qservice-chip chip-active px-3.5 py-2 rounded-full border theme-border font-mono text-xs transition-all">Custom Web App / CRM / POS</button>
+                <button type="button" data-qservice="Conversion Landing Page" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">Conversion Landing Page</button>
+                <button type="button" data-qservice="E-Commerce Store" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">E-Commerce Store</button>
+                <button type="button" data-qservice="UI/UX Design" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">UI/UX Design</button>
+                <button type="button" data-qservice="Meta Ads" class="qservice-chip chip-active px-3.5 py-2 rounded-full border theme-border font-mono text-xs transition-all">Meta Ads</button>
+                <button type="button" data-qservice="Google Ads" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">Google Ads</button>
+                <button type="button" data-qservice="TikTok Ads" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">TikTok Ads</button>
+                <button type="button" data-qservice="Pixel & CAPI Tracking" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">Pixel &amp; CAPI Tracking</button>
+                <button type="button" data-qservice="Creative Strategy & Full-Funnel" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">Creative Strategy &amp; Funnel</button>
+                <button type="button" data-qservice="Monthly Growth Retainer" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface-2 font-mono text-xs theme-muted transition-all">Monthly Growth Retainer</button>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label for="projectNote" class="block font-mono text-[11px] uppercase tracking-widest theme-muted mb-2">Brand / Note (Optional)</label>
+              <input id="projectNote" type="text" placeholder="e.g. Retail brand needing POS + Meta Ads setup..." class="w-full px-4 py-3 rounded-2xl theme-surface-2 border theme-border text-sm theme-text focus:outline-none transition-colors" />
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 soft-card p-6 sm:p-8 reveal-block">
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs uppercase tracking-widest theme-muted">Live Brief Preview</span>
+              <span class="px-2.5 py-1 rounded-full theme-accent-soft font-mono text-[11px] theme-accent-text">Custom Quote</span>
+            </div>
+
+            <div id="briefPreview" class="mt-4 p-4 rounded-2xl theme-surface-2 border theme-border font-mono text-xs theme-text leading-relaxed whitespace-pre-line"></div>
+
+            <div class="mt-6 space-y-3">
+              <a id="emailBriefBtn" href="mailto:mdsameersakib@gmail.com" class="magnetic-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full theme-accent font-mono text-xs font-medium uppercase tracking-wider hover:opacity-90 transition-opacity">
+                Email Brief to mdsameersakib@gmail.com ↗
+              </a>
+
+              <button id="copyBriefBtn" type="button" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full border theme-border theme-surface-2 theme-text font-mono text-xs uppercase tracking-wider hover:opacity-80 transition-opacity">
+                Copy Brief for WhatsApp (@mdsameersakib)
+              </button>
+            </div>
+
+            <div class="mt-7 pt-5 border-t theme-border flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+              <span class="theme-muted">WhatsApp: <button id="copyHandleFooter" type="button" class="theme-text underline underline-offset-4">@mdsameersakib</button></span>
+              <div class="flex items-center gap-4">
+                <a href="https://github.com/mdsameersakib" target="_blank" rel="noopener noreferrer" class="theme-muted hover:opacity-100 transition-opacity">GitHub ↗</a>
+                <a href="https://linkedin.com/in/mdsameersakib" target="_blank" rel="noopener noreferrer" class="theme-muted hover:opacity-100 transition-opacity">LinkedIn ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t theme-border py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono theme-muted">
+      <span>© 2026 Md. Sameer Sakib · B.Sc. CS, BRAC University</span>
+      <span>Software + Performance Marketing · Dhaka &amp; Worldwide</span>
+    </div>
+  </footer>
+
+  <!-- Project Detail Modal -->
+  <div id="projectModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+    <div class="relative w-full max-w-xl rounded-3xl border theme-border theme-surface p-6 sm:p-8 shadow-2xl">
+      <button id="closeModalBtn" type="button" aria-label="Close modal" class="absolute top-5 right-5 w-9 h-9 rounded-full border theme-border flex items-center justify-center theme-muted hover:opacity-100 transition-opacity">
+        ✕
+      </button>
+      <span id="modalCategory" class="font-mono text-[11px] uppercase tracking-widest theme-accent-text"></span>
+      <h3 id="modalTitle" class="mt-2 font-display font-bold text-2xl sm:text-3xl theme-text"></h3>
+      <p id="modalSummary" class="mt-3 text-sm theme-muted leading-relaxed"></p>
+      <div id="modalHighlights" class="mt-5 space-y-2 text-xs theme-text"></div>
+      <div id="modalStack" class="mt-5 flex flex-wrap gap-2"></div>
+      <div class="mt-7 pt-5 border-t theme-border flex flex-wrap items-center justify-between gap-3">
+        <a id="modalLink" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full theme-accent font-mono text-xs font-medium uppercase tracking-wider hover:opacity-90 transition-opacity">
+          View Repository ↗
+        </a>
+        <button id="modalQuoteBtn" type="button" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border theme-border theme-surface-2 theme-text font-mono text-xs uppercase tracking-wider">
+          Build Something Similar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="pointer-events-none fixed bottom-6 right-6 z-50 opacity-0 translate-y-3 transition-all duration-300 px-4 py-3 rounded-full theme-accent font-mono text-xs font-medium shadow-lg">
+    Copied to clipboard
+  </div>
+
+  <script>
+    // ----- SIGNATURE CORAL ORANGE PALETTE (DARK + LIGHT SAFE) -----
+    const ACCENTS = {
+      coral: {
+        dark:  { accent: '#FF6B4A', text: '#FF8566', ink: '#09090B', soft: 'rgba(255,107,74,0.14)', glow: 'rgba(255,107,74,0.22)' },
+        light: { accent: '#E04F2E', text: '#D64120', ink: '#FFFFFF', soft: 'rgba(224,79,46,0.11)', glow: 'rgba(224,79,46,0.18)' },
+      },
+    };
+
+    let currentTheme = 'dark';
+
+    function applyAccent() {
+      const palette = ACCENTS.coral[currentTheme];
+      const root = document.documentElement;
+      root.style.setProperty('--accent', palette.accent);
+      root.style.setProperty('--accent-text', palette.text);
+      root.style.setProperty('--accent-ink', palette.ink);
+      root.style.setProperty('--accent-soft', palette.soft);
+      root.style.setProperty('--accent-glow', palette.glow);
+      if (typeof updateThreeAccent === 'function') updateThreeAccent(palette.accent);
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      const sun = document.getElementById('sunIcon');
+      const moon = document.getElementById('moonIcon');
+      if (theme === 'light') {
+        sun.classList.remove('hidden');
+        moon.classList.add('hidden');
+      } else {
+        sun.classList.add('hidden');
+        moon.classList.remove('hidden');
+      }
+      applyAccent();
+    }
+
+    function toggleThemeWithRipple() {
+      const btn = document.getElementById('themeToggleBtn');
+      const rect = btn.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      const endRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      if (document.startViewTransition) {
+        const transition = document.startViewTransition(() => {
+          applyTheme(nextTheme);
+        });
+        transition.ready.then(() => {
+          document.documentElement.animate(
+            {
+              clipPath: [
+                `circle(0px at ${x}px ${y}px)`,
+                `circle(${endRadius}px at ${x}px ${y}px)`,
+              ],
+            },
+            {
+              duration: 620,
+              easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+              pseudoElement: '::view-transition-new(root)',
+            }
+          );
+        }).catch(() => {});
+      } else {
+        const overlay = document.getElementById('rippleOverlay');
+        overlay.style.backgroundColor = nextTheme === 'light' ? '#F6F6F2' : '#09090B';
+        overlay.style.opacity = '1';
+        gsap.fromTo(
+          overlay,
+          { clipPath: `circle(0px at ${x}px ${y}px)` },
+          {
+            clipPath: `circle(${endRadius}px at ${x}px ${y}px)`,
+            duration: 0.55,
+            ease: 'power3.inOut',
+            onComplete: () => {
+              applyTheme(nextTheme);
+              gsap.to(overlay, { opacity: 0, duration: 0.25 });
+            },
+          }
+        );
+      }
+    }
+
+    // ----- DATA -----
+    const SERVICES = [
+      {
+        id: 'crm-pos',
+        category: 'software',
+        tag: '01 · Systems',
+        title: 'Custom CRM, POS & Web Apps',
+        pitch: 'Custom portals, inventory, and order systems built to fit how your business runs.',
+        pills: ['Next.js', 'Supabase', 'TypeScript', 'RBAC'],
+      },
+      {
+        id: 'landing-ecom',
+        category: 'software',
+        tag: '02 · Storefronts',
+        title: 'Landing Pages & Stores',
+        pitch: 'Fast pages and online stores designed to turn ad clicks into paid orders.',
+        pills: ['Fast Checkout', 'Mobile-First', 'High Speed'],
+      },
+      {
+        id: 'ui-ux',
+        category: 'software',
+        tag: '03 · Upgrades',
+        title: 'UI/UX & Site Upgrades',
+        pitch: 'Cleaner design or new features added straight into your current website.',
+        pills: ['UI Design', 'Motion', 'Existing Sites'],
+      },
+      {
+        id: 'paid-ads',
+        category: 'marketing',
+        tag: '04 · Paid Ads',
+        title: 'Meta, Google & TikTok Ads',
+        pitch: 'Ad campaigns set up, tested, and managed daily to bring profitable sales.',
+        pills: ['Meta Ads', 'Google Ads', 'TikTok Ads'],
+      },
+      {
+        id: 'tracking',
+        category: 'marketing',
+        tag: '05 · Tracking',
+        title: 'Pixel & CAPI Setup',
+        pitch: 'Accurate conversion tracking so ad platforms know which ads drive real buyers.',
+        pills: ['Meta CAPI', 'GTM / GA4', 'Clean Events'],
+      },
+      {
+        id: 'retainer',
+        category: 'marketing',
+        tag: '06 · Growth',
+        title: 'Creative & Monthly Growth',
+        pitch: 'Ongoing ad testing and page improvements so your sales keep growing.',
+        pills: ['Ad Angles', 'Funnel Fixes', 'Monthly Plan'],
+      },
+    ];
+
+    const PROJECTS = [
+      {
+        id: 'business-crm',
+        group: 'systems',
+        year: '2025 — Present',
+        title: 'Business CRM & POS System',
+        short: 'Live retail CRM & POS running across multiple stores in Bangladesh.',
+        stack: ['Next.js', 'Supabase', 'RBAC', 'Courier API'],
+        mockup: 'bars',
+        highlights: [
+          'Live POS with full order tracking and courier dispatch',
+          'Multi-store stock tracking with low-stock alerts',
+          'Staff permissions per page and feature',
+        ],
+        url: 'https://github.com/mdsameersakib',
+        ctaLabel: 'GitHub Profile ↗',
+      },
+      {
+        id: 'dental-crm',
+        group: 'systems',
+        year: '2026',
+        title: 'Dental CRM Platform',
+        short: 'Clinic platform with online booking, staff CRM, and AI patient assistant.',
+        stack: ['Next.js', 'TypeScript', 'Supabase', 'Gemini API'],
+        mockup: 'cards',
+        highlights: [
+          'Public booking site, staff CRM, and patient portal',
+          'Visit tracking, treatment notes, and aftercare',
+          'Scan storage and AI assistant for patients',
+        ],
+        url: 'https://github.com/mdsameersakib/dental-crm',
+        ctaLabel: 'View Repository ↗',
+      },
+      {
+        id: 'poralikha',
+        group: 'systems',
+        year: '2024 — 2025',
+        title: 'Poralikha Education Platform',
+        short: 'Classroom, attendance, leave approval, and calendar system for schools.',
+        stack: ['Next.js', 'React', 'Supabase RLS', 'ShadCN UI'],
+        mockup: 'grid',
+        highlights: [
+          'Secure login for students and teachers',
+          'Online leave requests and teacher approvals',
+          'Shared monthly and weekly class calendar',
+        ],
+        url: 'https://github.com/mdsameersakib/poralikha-website',
+        ctaLabel: 'View Repository ↗',
+      },
+      {
+        id: 'amartaka',
+        group: 'products',
+        year: '2025',
+        title: 'AmarTaka — Finance App',
+        short: 'Fast, offline-first personal expense tracker with multi-wallet charts.',
+        stack: ['Next.js', 'TypeScript', 'PWA', 'Tailwind CSS'],
+        mockup: 'bars',
+        highlights: [
+          'Works offline with instant load and full privacy',
+          'Multi-wallet tracking and monthly spending charts',
+          'Quick search and filters across transaction history',
+        ],
+        url: 'https://github.com/mdsameersakib/AmarTaka',
+        ctaLabel: 'View Repository ↗',
+      },
+      {
+        id: 'bongshobrikkho',
+        group: 'products',
+        year: '2023',
+        title: 'Bongshobrikkho Family Tree',
+        short: 'Interactive family tree builder and shared photo archive.',
+        stack: ['React', 'React Flow', 'Zustand', 'Firestore'],
+        mockup: 'cards',
+        highlights: [
+          'Zoomable family tree for large relationships',
+          'Email invites so relatives can co-edit profiles',
+          'Shared photo wall and birthday reminders',
+        ],
+        url: 'https://github.com/mdsameersakib/Bongshobrikkho',
+        ctaLabel: 'View Repository ↗',
+      },
+      {
+        id: 'antigravity-cli',
+        group: 'products',
+        year: '2026',
+        title: 'Antigravity CLI Usage Stats',
+        short: 'VS Code extension showing live CLI usage limits in the status bar.',
+        stack: ['VS Code API', 'TypeScript', '35+ Installs'],
+        mockup: 'grid',
+        highlights: [
+          'Live status bar view for CLI quotas and limits',
+          'Published on VS Code Marketplace with 35+ installs',
+        ],
+        url: 'https://marketplace.visualstudio.com/items?itemName=mdsameersakib.antigravitycli-usage-stats',
+        ctaLabel: 'VS Marketplace ↗',
+      },
+    ];
+
+    // ----- STATE -----
+    let activeServiceMode = 'all';
+    let activeWorkFilter = 'all';
+    let lenisInstance = null;
+    let quoteState = {
+      origin: 'Build from scratch',
+      market: 'Bangladesh',
+      services: new Set(['Custom Web App / CRM / POS', 'Meta Ads']),
+      note: '',
+    };
+
+    // ----- TOAST & CLIPBOARD -----
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2200);
+    }
+
+    function copyText(text, successMsg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(() => fallbackCopy(text, successMsg));
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg);
+      } catch (e) {
+        showToast('Could not copy automatically');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // ----- SPLIT TEXT FOR SCROLL REVEALS -----
+    function initSplitTextReveals() {
+      document.querySelectorAll('.split-reveal').forEach(el => {
+        const text = el.textContent.trim();
+        const words = text.split(/\s+/);
+        el.innerHTML = words.map(w =>
+          `<span class="word-mask"><span class="word-inner">${w}</span></span>`
+        ).join(' ');
+
+        const wordInners = el.querySelectorAll('.word-inner');
+        gsap.from(wordInners, {
+          yPercent: 115,
+          opacity: 0,
+          duration: 0.75,
+          stagger: 0.055,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            once: true,
+          },
+        });
+      });
+
+      gsap.utils.toArray('.scroll-fade').forEach(el => {
+        gsap.from(el, {
+          y: 18,
+          opacity: 0,
+          duration: 0.65,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+        });
+      });
+    }
+
+    // ----- RENDER SERVICES -----
+    let servicesFirstRender = true;
+    function renderServices() {
+      const grid = document.getElementById('servicesGrid');
+      if (!grid) return;
+      const filtered = activeServiceMode === 'all'
+        ? SERVICES
+        : SERVICES.filter(s => s.category === activeServiceMode);
+
+      grid.innerHTML = filtered.map(s => `
+        <article class="soft-card p-6 sm:p-7 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-xs font-medium uppercase tracking-widest theme-accent-text">${s.tag}</span>
+              <span class="font-mono text-xs uppercase tracking-wider px-3 py-1 rounded-full border theme-border theme-muted">
+                ${s.category === 'software' ? 'Software' : 'Marketing'}
+              </span>
+            </div>
+            <h3 class="mt-4 font-display font-bold text-xl sm:text-2xl theme-text">${s.title}</h3>
+            <p class="mt-2.5 text-base theme-muted leading-relaxed">${s.pitch}</p>
+          </div>
+          <div class="mt-6 pt-4 border-t theme-border flex flex-wrap gap-1.5">
+            ${s.pills.map(p => `<span class="px-3 py-1 rounded-full theme-surface-2 border theme-border font-mono text-xs theme-text">${p}</span>`).join('')}
+          </div>
+        </article>
+      `).join('');
+
+      if (servicesFirstRender) {
+        servicesFirstRender = false;
+        gsap.from(grid.children, {
+          y: 34,
+          opacity: 0,
+          scale: 0.97,
+          duration: 0.65,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: grid, start: 'top 85%', once: true },
+        });
+      } else {
+        gsap.fromTo(grid.children,
+          { y: 18, opacity: 0, scale: 0.97 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.45, stagger: 0.06, ease: 'power3.out', overwrite: true }
+        );
+      }
+      ScrollTrigger.refresh();
+    }
+
+    // ----- ROUNDED PROJECT MINI MOCKUP -----
+    function getMockupMarkup(type) {
+      if (type === 'bars') {
+        return `
+          <div class="h-28 rounded-2xl theme-surface-2 border theme-border p-3 flex flex-col justify-between mb-4">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-rose-400/70"></span>
+              <span class="w-2 h-2 rounded-full bg-amber-400/70"></span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400/70"></span>
+            </div>
+            <div class="flex items-end gap-2 h-14 px-1">
+              <span class="flex-1 rounded-t-lg h-[45%] theme-accent opacity-50"></span>
+              <span class="flex-1 rounded-t-lg h-[72%] theme-accent opacity-75"></span>
+              <span class="flex-1 rounded-t-lg h-[58%] theme-accent opacity-60"></span>
+              <span class="flex-1 rounded-t-lg h-[92%] theme-accent"></span>
+              <span class="flex-1 rounded-t-lg h-[78%] theme-accent opacity-85"></span>
+            </div>
+          </div>`;
+      }
+      if (type === 'cards') {
+        return `
+          <div class="h-28 rounded-2xl theme-surface-2 border theme-border p-3 flex flex-col justify-between mb-4">
+            <div class="w-1/2 h-2.5 rounded-full theme-accent opacity-80"></div>
+            <div class="grid grid-cols-3 gap-2">
+              <div class="h-12 rounded-xl border theme-border theme-surface"></div>
+              <div class="h-12 rounded-xl border theme-border theme-accent-soft"></div>
+              <div class="h-12 rounded-xl border theme-border theme-surface"></div>
+            </div>
+          </div>`;
+      }
+      return `
+        <div class="h-28 rounded-2xl theme-surface-2 border theme-border p-3 grid grid-cols-4 gap-1.5 mb-4">
+          <div class="rounded-lg theme-surface border theme-border"></div>
+          <div class="rounded-lg theme-accent-soft border theme-border"></div>
+          <div class="rounded-lg theme-surface border theme-border"></div>
+          <div class="rounded-lg theme-surface border theme-border"></div>
+          <div class="rounded-lg theme-surface border theme-border"></div>
+          <div class="rounded-lg theme-surface border theme-border"></div>
+          <div class="rounded-lg theme-accent opacity-80"></div>
+          <div class="rounded-lg theme-surface border theme-border"></div>
+        </div>`;
+    }
+
+    // ----- RENDER WORK -----
+    let workFirstRender = true;
+    function renderWork() {
+      const grid = document.getElementById('workGrid');
+      if (!grid) return;
+      const filtered = activeWorkFilter === 'all'
+        ? PROJECTS
+        : PROJECTS.filter(p => p.group === activeWorkFilter);
+
+      grid.innerHTML = filtered.map(p => `
+        <article data-project-id="${p.id}" class="project-card soft-card group cursor-pointer p-6 flex flex-col justify-between">
+          <div>
+            ${getMockupMarkup(p.mockup)}
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-xs uppercase tracking-widest theme-muted">${p.year}</span>
+              <span class="font-mono text-xs font-medium theme-accent-text group-hover:translate-x-0.5 transition-transform">Inspect ↗</span>
+            </div>
+            <h3 class="mt-3 font-display font-bold text-xl theme-text">${p.title}</h3>
+            <p class="mt-2 text-base theme-muted leading-relaxed">${p.short}</p>
+          </div>
+          <div class="mt-5 flex flex-wrap gap-1.5">
+            ${p.stack.map(st => `<span class="px-3 py-1 rounded-full theme-surface-2 border theme-border font-mono text-xs theme-text">${st}</span>`).join('')}
+          </div>
+        </article>
+      `).join('');
+
+      grid.querySelectorAll('.project-card').forEach(card => {
+        card.addEventListener('click', () => openProjectModal(card.dataset.projectId));
+      });
+
+      if (workFirstRender) {
+        workFirstRender = false;
+        gsap.from(grid.children, {
+          y: 34,
+          opacity: 0,
+          scale: 0.97,
+          duration: 0.65,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: grid, start: 'top 85%', once: true },
+        });
+      } else {
+        gsap.fromTo(grid.children,
+          { y: 18, opacity: 0, scale: 0.97 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.45, stagger: 0.06, ease: 'power3.out', overwrite: true }
+        );
+      }
+      ScrollTrigger.refresh();
+    }
+
+    // ----- PROJECT MODAL -----
+    function openProjectModal(id) {
+      const p = PROJECTS.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById('modalCategory').textContent = `${p.year} · ${p.group === 'systems' ? 'Production System' : 'Product & Tool'}`;
+      document.getElementById('modalTitle').textContent = p.title;
+      document.getElementById('modalSummary').textContent = p.short;
+      document.getElementById('modalHighlights').innerHTML = p.highlights.map(h =>
+        `<div class="flex items-start gap-2.5"><span class="theme-accent-text mt-0.5">◆</span><span>${h}</span></div>`
+      ).join('');
+      document.getElementById('modalStack').innerHTML = p.stack.map(s =>
+        `<span class="px-3 py-1 rounded-full theme-surface-2 border theme-border font-mono text-[11px] theme-text">${s}</span>`
+      ).join('');
+      const link = document.getElementById('modalLink');
+      link.href = p.url;
+      link.textContent = p.ctaLabel;
+
+      const modal = document.getElementById('projectModal');
+      modal.classList.remove('hidden');
+      gsap.fromTo(modal.firstElementChild, { y: 24, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.34, ease: 'back.out(1.4)' });
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModal').classList.add('hidden');
+    }
+
+    // ----- QUOTE BRIEF BUILDER -----
+    function updateBrief() {
+      const selected = Array.from(quoteState.services);
+      const servicesText = selected.length ? selected.join(', ') : 'General Consultation';
+      const noteLine = quoteState.note.trim() ? `\nNote: ${quoteState.note.trim()}` : '';
+
+      const brief =
+        `Hi Sameer,\n` +
+        `Setup: ${quoteState.origin}\n` +
+        `Market: ${quoteState.market}\n` +
+        `Services: ${servicesText}${noteLine}\n` +
+        `Looking for a custom quote.`;
+
+      document.getElementById('briefPreview').textContent = brief;
+
+      const mailto = `mailto:mdsameersakib@gmail.com?subject=${encodeURIComponent('Project Inquiry — ' + servicesText)}&body=${encodeURIComponent(brief)}`;
+      document.getElementById('emailBriefBtn').href = mailto;
+      return brief;
+    }
+
+    // ----- MAGNETIC BUTTONS -----
+    function initMagneticButtons() {
+      if (window.matchMedia('(hover: none)').matches) return;
+      document.querySelectorAll('.magnetic-btn').forEach(btn => {
+        const xTo = gsap.quickTo(btn, 'x', { duration: 0.35, ease: 'power3.out' });
+        const yTo = gsap.quickTo(btn, 'y', { duration: 0.35, ease: 'power3.out' });
+
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const relX = e.clientX - (rect.left + rect.width / 2);
+          const relY = e.clientY - (rect.top + rect.height / 2);
+          xTo(relX * 0.22);
+          yTo(relY * 0.22);
+        });
+        btn.addEventListener('mouseleave', () => {
+          xTo(0);
+          yTo(0);
+        });
+      });
+    }
+
+    // ----- THREE.JS 2D PORTRAIT WITH HEADER-SYNCED BLINKING -----
+    let threeRimUniform = null;
+    function updateThreeAccent(hex) {
+      if (threeRimUniform && typeof THREE !== 'undefined') {
+        threeRimUniform.value.set(hex);
+      }
+    }
+
+    function initThreeAvatar() {
+      const canvas = document.getElementById('avatarCanvas');
+      if (!canvas || typeof THREE === 'undefined') return;
+
+      const wrap = canvas.parentElement;
+      const w = wrap.clientWidth || 300;
+      const h = wrap.clientHeight || 300;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(32, w / h, 0.1, 50);
+      camera.position.set(0, 0, 4.4);
+
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(w, h, false);
+
+      const accentHex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#22d3ee';
+      threeRimUniform = { value: new THREE.Color(accentHex) };
+
+      const loader = new THREE.TextureLoader();
+      const colorTex = loader.load('./avatar.png', (tex) => {
+        if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+      });
+
+      const uniforms = {
+        uColorMap: { value: colorTex },
+        uAccent: threeRimUniform,
+        uBlink: { value: 0 },
+      };
+
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        transparent: true,
+        depthWrite: false,
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D uColorMap;
+          uniform vec3 uAccent;
+          uniform float uBlink;
+          varying vec2 vUv;
+
+          float eyeMask(vec2 uv, vec2 center, vec2 radii) {
+            vec2 d = (uv - center) / radii;
+            return smoothstep(1.0, 0.28, length(d));
+          }
+
+          void main() {
+            vec4 texel = texture2D(uColorMap, vUv);
+            if (texel.a < 0.02) discard;
+
+            // Natural upper-eyelid blink matched to exact eye opening bounds
+            if (uBlink > 0.001) {
+              vec2 leftEye = vec2(0.4102, 0.5850);
+              vec2 leftRadii = vec2(0.042, 0.025);
+              vec2 rightEye = vec2(0.5625, 0.5850);
+              vec2 rightRadii = vec2(0.040, 0.025);
+              float mEye = clamp(eyeMask(vUv, leftEye, leftRadii) + eyeMask(vUv, rightEye, rightRadii), 0.0, 1.0);
+              if (mEye > 0.01) {
+                float eyeTop = 0.608;
+                float eyeBot = 0.564;
+                float lidY = mix(eyeTop, eyeBot, uBlink);
+                float lidMask = smoothstep(lidY - 0.005, lidY + 0.003, vUv.y) * mEye;
+                float lashMask = exp(-pow((vUv.y - lidY) / 0.0032, 2.0)) * mEye * smoothstep(0.02, 0.15, uBlink);
+                // Sample clean lower-eyelid / upper-cheek skin tone (avoids dark glasses frame above eye)
+                vec3 lidColor = texture2D(uColorMap, vec2(vUv.x, 0.556)).rgb * 0.96;
+                texel.rgb = mix(texel.rgb, lidColor, lidMask * 0.96);
+                texel.rgb = mix(texel.rgb, vec3(0.14, 0.08, 0.06), lashMask * 0.72);
+              }
+            }
+
+            // Subtle theme-colored rim highlight along silhouette edge
+            vec2 rimOffset = vec2(0.010, -0.006);
+            float neighborAlpha = texture2D(uColorMap, clamp(vUv + rimOffset, 0.0, 1.0)).a;
+            float rimMask = clamp((texel.a - neighborAlpha) * 1.4, 0.0, 1.0);
+            vec3 finalRgb = texel.rgb + uAccent * rimMask * 0.28;
+
+            gl_FragColor = vec4(finalRgb, texel.a);
+          }
+        `,
+      });
+
+      const avatarMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.48, 2.48, 1, 1), material);
+      avatarMesh.position.set(0, -0.04, 0);
+      scene.add(avatarMesh);
+
+      // Expose blink trigger so header text swap can trigger it in sync
+      window.triggerAvatarBlink = () => {
+        gsap.fromTo(uniforms.uBlink, { value: 0 }, {
+          value: 1,
+          duration: 0.11,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power2.inOut',
+          overwrite: true,
+        });
+      };
+
+      // Resize Handler
+      const ro = new ResizeObserver(() => {
+        const nw = wrap.clientWidth || 300;
+        const nh = wrap.clientHeight || 300;
+        camera.aspect = nw / nh;
+        camera.updateProjectionMatrix();
+        renderer.setSize(nw, nh, false);
+      });
+      ro.observe(wrap);
+
+      // Render Loop
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    // ----- INIT LENIS + GSAP -----
+    window.addEventListener('DOMContentLoaded', () => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      if (typeof Lenis !== 'undefined') {
+        lenisInstance = new Lenis({
+          duration: 1.25,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          smoothWheel: true,
+          wheelMultiplier: 0.95,
+        });
+        lenisInstance.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+          lenisInstance.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', (e) => {
+          const targetId = anchor.getAttribute('href');
+          if (targetId && targetId.length > 1) {
+            const targetEl = document.querySelector(targetId);
+            if (targetEl) {
+              e.preventDefault();
+              if (lenisInstance) {
+                lenisInstance.scrollTo(targetEl, { offset: -64 });
+              } else {
+                targetEl.scrollIntoView({ behavior: 'smooth' });
+              }
+            }
+          }
+        });
+      });
+
+      initSplitTextReveals();
+      renderServices();
+      renderWork();
+      updateBrief();
+      initMagneticButtons();
+
+      // Theme Ripple Event
+      document.getElementById('themeToggleBtn').addEventListener('click', toggleThemeWithRipple);
+
+      // Top Scroll Progress Bar
+      gsap.to('#scrollProgress', {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: document.body,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.15,
+        },
+      });
+
+      // Hero Entrance & Orbital Motion
+      const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+      tl.from('.hero-line', { yPercent: 115, duration: 0.95, stagger: 0.14 })
+        .from('.hero-stagger', { y: 24, opacity: 0, duration: 0.7, stagger: 0.08 }, '-=0.5');
+
+      // Smoothly cycle hero headline with dynamic centered width + synced blink
+      const swapSlot1 = document.getElementById('swapSlot1');
+      const swapSlot2 = document.getElementById('swapSlot2');
+      const measureWord = (slot, cls) => {
+        const el = slot ? slot.querySelector(`.${cls}`) : null;
+        return el ? Math.ceil(el.getBoundingClientRect().width) + 2 : 0;
+      };
+      const setInitialSwapWidths = () => {
+        if (swapSlot1) swapSlot1.style.width = `${measureWord(swapSlot1, 'swap-a')}px`;
+        if (swapSlot2) swapSlot2.style.width = `${measureWord(swapSlot2, 'swap-a')}px`;
+      };
+      setInitialSwapWidths();
+
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && swapSlot1 && swapSlot2) {
+        let activeCls = 'swap-a';
+        const runSwapInit = () => {
+          gsap.set('.swap-a', { yPercent: 0, opacity: 1 });
+          gsap.set('.swap-b, .swap-c', { yPercent: 110, opacity: 0 });
+          setInitialSwapWidths();
+
+          const swapTl = gsap.timeline({ repeat: -1, delay: 1.8 });
+          const addStep = (fromCls, toCls) => {
+            swapTl
+              .call(() => {
+                activeCls = toCls;
+                if (window.triggerAvatarBlink) window.triggerAvatarBlink();
+              })
+              .to(swapSlot1, { width: () => measureWord(swapSlot1, toCls), duration: 0.5, ease: 'power3.inOut' }, '<')
+              .to(swapSlot2, { width: () => measureWord(swapSlot2, toCls), duration: 0.5, ease: 'power3.inOut' }, '<')
+              .to(`.${fromCls}`, { yPercent: -110, opacity: 0, duration: 0.5, ease: 'power3.inOut' }, '<')
+              .fromTo(`.${toCls}`, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.52, ease: 'power3.out', immediateRender: false }, '<0.06')
+              .to({}, { duration: 1.8 });
+          };
+          addStep('swap-a', 'swap-b');
+          addStep('swap-b', 'swap-c');
+          addStep('swap-c', 'swap-a');
+        };
+
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(runSwapInit);
+        } else {
+          runSwapInit();
+        }
+        window.addEventListener('resize', () => {
+          swapSlot1.style.width = `${measureWord(swapSlot1, activeCls)}px`;
+          swapSlot2.style.width = `${measureWord(swapSlot2, activeCls)}px`;
+        });
+      }
+
+      // 3D Solar-System Orbit Animation (passes in front & behind avatar with depth scaling)
+      const heroOrb = document.getElementById('heroOrb');
+      const orbitLogos = Array.from(document.querySelectorAll('.orbit-logo'));
+      if (heroOrb && orbitLogos.length) {
+        const tiltX = 22 * (Math.PI / 180);
+        const sinX = Math.sin(tiltX);
+        const cosX = Math.cos(tiltX);
+        const tiltA = -28 * (Math.PI / 180);
+        const tiltB = 28 * (Math.PI / 180);
+
+        const updateOrbitPositions = (time) => {
+          const R = (heroOrb.clientWidth || 300) * 0.65;
+          orbitLogos.forEach((el) => {
+            const isRingA = el.dataset.ring === 'a';
+            const baseDeg = parseFloat(el.dataset.angle || '0');
+            // Equal angular speed + 60° phase offset between Ring A (0,120,240) and Ring B (60,180,300)
+            // mathematically guarantees >= 109px separation at 350px orb width across the full 360° cycle
+            const theta = (baseDeg * Math.PI / 180) + time * 0.34;
+
+            const x0 = R * Math.cos(theta);
+            const y1 = R * Math.sin(theta) * sinX;
+            const z1 = R * Math.sin(theta) * cosX;
+
+            const tiltZ = isRingA ? tiltA : tiltB;
+            const x = x0 * Math.cos(tiltZ) - y1 * Math.sin(tiltZ);
+            const y = x0 * Math.sin(tiltZ) + y1 * Math.cos(tiltZ);
+
+            const depthNorm = z1 / (R * cosX); // -1 (back) to +1 (front)
+            const scale = 0.84 + (depthNorm + 1) * 0.16; // 0.84 in back -> 1.16 in front
+            const opacity = 0.65 + (depthNorm + 1) * 0.175;
+
+            el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+            el.style.opacity = opacity.toFixed(2);
+            el.style.zIndex = z1 >= 0 ? '4' : '1';
+          });
+        };
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          updateOrbitPositions(0);
+        } else {
+          gsap.ticker.add((time) => updateOrbitPositions(time));
+        }
+      }
+
+      // Initialize 3D Character
+      initThreeAvatar();
+
+      // Results Cards Reveal
+      gsap.from('.result-card', {
+        y: 30,
+        opacity: 0,
+        scale: 0.96,
+        duration: 0.65,
+        stagger: 0.1,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '#results', start: 'top 80%', once: true },
+      });
+
+      // Process Line & Cards Reveal
+      gsap.to('#processLine', {
+        scaleX: 1,
+        duration: 1.1,
+        ease: 'power3.inOut',
+        scrollTrigger: { trigger: '#process', start: 'top 78%', once: true },
+      });
+
+      gsap.from('.process-card', {
+        y: 32,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.14,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '#process', start: 'top 78%', once: true },
+      });
+
+      // Quote Section Reveal
+      gsap.utils.toArray('.reveal-block').forEach((el, idx) => {
+        gsap.from(el, {
+          y: 32,
+          opacity: 0,
+          duration: 0.75,
+          delay: idx * 0.08,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 86%', once: true },
+        });
+      });
+
+      // Cursor spotlight
+      const glow = document.getElementById('cursorGlow');
+      window.addEventListener('mousemove', (e) => {
+        glow.style.opacity = '1';
+        gsap.to(glow, { x: e.clientX, y: e.clientY, duration: 0.35, ease: 'power2.out' });
+      });
+
+      // Mobile menu
+      const mobileBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+      });
+
+      // Service Mode Buttons
+      document.querySelectorAll('.service-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeServiceMode = btn.dataset.serviceMode;
+          document.querySelectorAll('.service-mode-btn').forEach(b => {
+            b.classList.remove('theme-accent', 'font-medium');
+            b.classList.add('theme-muted');
+          });
+          btn.classList.add('theme-accent', 'font-medium');
+          btn.classList.remove('theme-muted');
+          renderServices();
+        });
+      });
+
+      // Work Filter Buttons
+      document.querySelectorAll('.work-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeWorkFilter = btn.dataset.workFilter;
+          document.querySelectorAll('.work-filter-btn').forEach(b => {
+            b.classList.remove('theme-accent', 'font-medium');
+            b.classList.add('theme-muted', 'theme-surface');
+          });
+          btn.classList.add('theme-accent', 'font-medium');
+          btn.classList.remove('theme-muted', 'theme-surface');
+          renderWork();
+        });
+      });
+
+      // Modal events
+      document.getElementById('closeModalBtn').addEventListener('click', closeProjectModal);
+      document.getElementById('projectModal').addEventListener('click', (e) => {
+        if (e.target.id === 'projectModal') closeProjectModal();
+      });
+      document.getElementById('modalQuoteBtn').addEventListener('click', () => {
+        closeProjectModal();
+        const q = document.getElementById('quote');
+        if (lenisInstance) lenisInstance.scrollTo(q, { offset: -64 });
+        else q.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // Quote Origin Chips
+      document.querySelectorAll('.origin-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          quoteState.origin = btn.dataset.origin;
+          document.querySelectorAll('.origin-chip').forEach(b => b.classList.remove('chip-active'));
+          btn.classList.add('chip-active');
+          updateBrief();
+        });
+      });
+
+      // Quote Market Chips
+      document.querySelectorAll('.market-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          quoteState.market = btn.dataset.market;
+          document.querySelectorAll('.market-chip').forEach(b => b.classList.remove('chip-active'));
+          btn.classList.add('chip-active');
+          updateBrief();
+        });
+      });
+
+      // Quote Service Multi-Select Chips
+      document.querySelectorAll('.qservice-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.dataset.qservice;
+          if (quoteState.services.has(val)) {
+            quoteState.services.delete(val);
+            btn.classList.remove('chip-active');
+          } else {
+            quoteState.services.add(val);
+            btn.classList.add('chip-active');
+          }
+          updateBrief();
+        });
+      });
+
+      // Quote Note Input
+      document.getElementById('projectNote').addEventListener('input', (e) => {
+        quoteState.note = e.target.value;
+        updateBrief();
+      });
+
+      // Copy Buttons
+      document.getElementById('copyBriefBtn').addEventListener('click', () => {
+        copyText(updateBrief(), 'Brief copied — message @mdsameersakib on WhatsApp');
+      });
+      document.getElementById('copyHandleFooter').addEventListener('click', () => {
+        copyText('@mdsameersakib', 'Copied @mdsameersakib');
+      });
+    });
+  </script>
+</body>
+</html>
