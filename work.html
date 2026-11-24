@@ -3,61 +3,172 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real Systems in Use — Md. Sameer Sakib</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Selected Work — Md. Sameer Sakib</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Google Sans', 'sans-serif'],
+            sans: ['Google Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
   <style>
     :root {
-      --bg: #0A0A0D;
-      --surface: #121218;
+      --bg: #09090B;
+      --surface: #131318;
       --surface-2: #1A1A22;
-      --border: rgba(244, 244, 240, 0.10);
       --text: #F4F4F0;
       --muted: #9494A0;
+      --border: rgba(244, 244, 240, 0.11);
+      --nav-bg: rgba(9, 9, 11, 0.76);
       --accent: #FF6B4A;
+      --accent-text: #FF8566;
+      --accent-ink: #09090B;
+      color-scheme: dark;
     }
+
+    html[data-theme="light"] {
+      --bg: #F6F6F2;
+      --surface: #FFFFFF;
+      --surface-2: #ECECE6;
+      --text: #111115;
+      --muted: #5C5C68;
+      --border: rgba(17, 17, 21, 0.11);
+      --nav-bg: rgba(246, 246, 242, 0.8);
+      --accent: #E04F2E;
+      --accent-text: #D64120;
+      --accent-ink: #FFFFFF;
+      color-scheme: light;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal;
+    }
+    ::view-transition-new(root) { z-index: 9999; }
+
     body {
-      background: var(--bg);
+      background-color: var(--bg);
       color: var(--text);
-      font-family: 'Google Sans', system-ui, sans-serif;
+      font-family: 'Google Sans', sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
-    .soft-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 1.5rem;
-      transition: border-color 0.25s ease, transform 0.25s ease;
+
+    .theme-bg { background-color: var(--bg); }
+    .theme-surface { background-color: var(--surface); }
+    .theme-surface-2 { background-color: var(--surface-2); }
+    .theme-text { color: var(--text); }
+    .theme-border { border-color: var(--border); }
+    .theme-accent { background-color: var(--accent); color: var(--accent-ink); }
+    .theme-accent-text { color: var(--accent-text); }
+
+    .glass-nav {
+      background: var(--nav-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
-    .soft-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
+
+    .metric-item {
+      border-top: 1px solid var(--border);
+      transition: border-color 0.25s ease;
+    }
+    .metric-item:hover {
+      border-top-color: var(--accent);
+    }
+    .metric-item .metric-title {
+      color: var(--text);
+      transition: color 0.25s ease;
+    }
+    .metric-item:hover .metric-title {
+      color: var(--accent);
+    }
+
+    .chip-active {
+      background-color: var(--accent) !important;
+      color: var(--accent-ink) !important;
+      border-color: var(--accent) !important;
+      opacity: 1 !important;
+    }
+
+    .theme-icon {
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #themeToggleBtn:hover .theme-icon {
+      transform: rotate(35deg) scale(1.12);
     }
   </style>
 </head>
-<body class="min-h-screen">
-  <header class="border-b border-white/10 py-5">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-      <a href="index.html" class="font-mono text-xs uppercase tracking-widest text-[#9494A0] hover:text-white transition">
-        ← Back to Home
+<body class="min-h-screen flex flex-col antialiased">
+  <!-- Top Navigation (Matches Home) -->
+  <header class="fixed top-0 inset-x-0 z-40 glass-nav border-b theme-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-2.5 group">
+        <span class="w-3 h-3 rounded-full theme-accent group-hover:scale-125 transition-transform"></span>
+        <span class="font-display font-bold tracking-tight text-sm sm:text-base theme-text">SAMEER SAKIB</span>
       </a>
-      <span class="font-mono text-xs uppercase tracking-widest text-[#FF6B4A]">Selected Work</span>
+
+      <nav class="hidden md:flex items-center gap-7 text-xs font-mono uppercase tracking-widest">
+        <a href="index.html#services" class="opacity-80 hover:opacity-100 transition-opacity theme-text">Services</a>
+        <a href="index.html#results" class="opacity-80 hover:opacity-100 transition-opacity theme-text">Results</a>
+        <a href="work.html" class="theme-accent-text font-medium">Work</a>
+        <a href="index.html#quote" class="opacity-80 hover:opacity-100 transition-opacity theme-text">Quote</a>
+      </nav>
+
+      <div class="flex items-center gap-2.5">
+        <button id="themeToggleBtn" type="button" aria-label="Toggle Dark or Light Mode" class="w-10 h-10 rounded-full border theme-border theme-surface flex items-center justify-center theme-text hover:scale-105 transition-all">
+          <svg id="sunIcon" class="theme-icon w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <svg id="moonIcon" class="theme-icon w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <a href="index.html#quote" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full theme-accent font-mono text-xs font-medium uppercase tracking-wider hover:opacity-90 transition-opacity">
+          Start a Project <span aria-hidden="true">↗</span>
+        </a>
+      </div>
     </div>
   </header>
 
-  <main class="py-16 sm:py-24">
+  <main class="flex-1 pt-28 pb-20 sm:pt-32 sm:pb-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <h1 class="font-bold text-3xl sm:text-5xl tracking-tight">Real systems in use.</h1>
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+        <div>
+          <a href="index.html" class="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest theme-accent-text hover:opacity-80 transition-opacity mb-3">
+            ← Back to Home
+          </a>
+          <h1 class="font-display font-bold text-3xl sm:text-5xl tracking-tight theme-text">Real systems in use.</h1>
+        </div>
+
         <div class="inline-flex flex-wrap gap-2">
-          <button type="button" data-work-filter="all" class="work-filter-btn px-4 py-2 rounded-full border border-white/10 font-mono text-xs uppercase tracking-wider bg-[#FF6B4A] text-[#0A0A0D] font-medium cursor-pointer">All (6)</button>
-          <button type="button" data-work-filter="systems" class="work-filter-btn px-4 py-2 rounded-full border border-white/10 bg-[#121218] font-mono text-xs uppercase tracking-wider text-[#9494A0] cursor-pointer">Business Systems</button>
-          <button type="button" data-work-filter="products" class="work-filter-btn px-4 py-2 rounded-full border border-white/10 bg-[#121218] font-mono text-xs uppercase tracking-wider text-[#9494A0] cursor-pointer">Apps &amp; Tools</button>
+          <button type="button" data-work-filter="all" class="work-filter-btn chip-active px-4 py-2 rounded-full border theme-border text-xs sm:text-sm font-medium cursor-pointer transition-all hover:border-[var(--accent)]">All (6)</button>
+          <button type="button" data-work-filter="systems" class="work-filter-btn px-4 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 cursor-pointer transition-all hover:border-[var(--accent)]">Business Systems</button>
+          <button type="button" data-work-filter="products" class="work-filter-btn px-4 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 cursor-pointer transition-all hover:border-[var(--accent)]">Apps &amp; Tools</button>
         </div>
       </div>
 
-      <div id="workGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      <div id="workGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12"></div>
     </div>
   </main>
+
+  <footer class="border-t theme-border py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono theme-text opacity-70">
+      <span>© 2026 Md. Sameer Sakib · B.Sc. CS, BRAC University</span>
+      <span>Software + Performance Marketing · Dhaka &amp; Worldwide</span>
+    </div>
+  </footer>
 
   <script>
     const PROJECTS = [
@@ -69,36 +180,69 @@
       { id: 'antigravity-cli', group: 'products', year: '2026', title: 'Antigravity CLI Usage Stats', short: 'VS Code extension showing live CLI usage limits in the status bar.', stack: ['VS Code API', 'TypeScript', '35+ Installs'], url: 'https://marketplace.visualstudio.com/items?itemName=mdsameersakib.antigravitycli-usage-stats', ctaLabel: 'VS Marketplace ↗' },
     ];
 
+    let currentTheme = 'dark';
+    try { currentTheme = localStorage.getItem('theme') || 'dark'; } catch (e) {}
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      try { localStorage.setItem('theme', theme); } catch (e) {}
+      document.getElementById('sunIcon').classList.toggle('hidden', theme !== 'light');
+      document.getElementById('moonIcon').classList.toggle('hidden', theme === 'light');
+    }
+    applyTheme(currentTheme);
+
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+      const btn = document.getElementById('themeToggleBtn');
+      const rect = btn.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      const endRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      if (document.startViewTransition) {
+        const t = document.startViewTransition(() => applyTheme(nextTheme));
+        t.ready.then(() => {
+          document.documentElement.animate(
+            { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`] },
+            { duration: 600, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' }
+          );
+        }).catch(() => {});
+      } else {
+        applyTheme(nextTheme);
+      }
+    });
+
     let activeFilter = 'all';
     function render() {
       const grid = document.getElementById('workGrid');
       const items = activeFilter === 'all' ? PROJECTS : PROJECTS.filter(p => p.group === activeFilter);
       grid.innerHTML = items.map(p => `
-        <a href="${p.url}" target="_blank" rel="noopener" class="soft-card p-6 flex flex-col justify-between">
+        <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="metric-item pt-5 flex flex-col justify-between group">
           <div>
             <div class="flex items-center justify-between gap-2">
-              <span class="font-mono text-xs uppercase tracking-widest text-[#9494A0]">${p.year}</span>
-              <span class="font-mono text-xs font-medium text-[#FF6B4A]">${p.ctaLabel}</span>
+              <span class="font-mono text-xs uppercase tracking-widest theme-text opacity-65">${p.year}</span>
+              <span class="font-mono text-xs font-medium theme-accent-text group-hover:translate-x-0.5 transition-transform">${p.ctaLabel}</span>
             </div>
-            <h3 class="mt-3 font-bold text-xl">${p.title}</h3>
-            <p class="mt-2 text-sm text-[#9494A0] leading-relaxed">${p.short}</p>
+            <h2 class="metric-title mt-3 font-display font-bold text-xl sm:text-2xl">${p.title}</h2>
+            <p class="mt-2 text-sm sm:text-base theme-text opacity-80 leading-relaxed">${p.short}</p>
           </div>
-          <div class="mt-5 flex flex-wrap gap-1.5">
-            ${p.stack.map(st => `<span class="px-3 py-1 rounded-full bg-[#1A1A22] border border-white/10 font-mono text-xs">${st}</span>`).join('')}
+          <div class="mt-5 flex flex-wrap gap-2">
+            ${p.stack.map(st => `<span class="px-3 py-1 rounded-full theme-surface border theme-border text-xs font-medium theme-text opacity-85">${st}</span>`).join('')}
           </div>
         </a>
       `).join('');
     }
+
     document.querySelectorAll('.work-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         activeFilter = btn.dataset.workFilter;
-        document.querySelectorAll('.work-filter-btn').forEach(b => {
-          b.className = 'work-filter-btn px-4 py-2 rounded-full border border-white/10 bg-[#121218] font-mono text-xs uppercase tracking-wider text-[#9494A0] cursor-pointer';
-        });
-        btn.className = 'work-filter-btn px-4 py-2 rounded-full border border-white/10 font-mono text-xs uppercase tracking-wider bg-[#FF6B4A] text-[#0A0A0D] font-medium cursor-pointer';
+        document.querySelectorAll('.work-filter-btn').forEach(b => b.classList.remove('chip-active'));
+        btn.classList.add('chip-active');
         render();
       });
     });
+
     render();
   </script>
 </body>
