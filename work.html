@@ -138,13 +138,27 @@
         <a href="index.html#quote" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full theme-accent font-mono text-xs font-medium uppercase tracking-wider hover:opacity-90 transition-opacity">
           Start a Project <span aria-hidden="true">↗</span>
         </a>
+
+        <button id="mobileMenuBtn" type="button" aria-label="Toggle Menu" class="md:hidden w-10 h-10 rounded-full border theme-border theme-surface flex items-center justify-center theme-text">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
       </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobileMenu" class="hidden md:hidden border-t theme-border theme-bg px-5 py-4 space-y-3.5 rounded-b-3xl shadow-xl">
+      <a href="index.html#services" class="block py-1 font-mono text-xs uppercase tracking-widest theme-text opacity-90">Services</a>
+      <a href="index.html#results" class="block py-1 font-mono text-xs uppercase tracking-widest theme-text opacity-90">Results</a>
+      <a href="work.html" class="block py-1 font-mono text-xs uppercase tracking-widest theme-accent-text font-medium">Work</a>
+      <a href="index.html#quote" class="block py-1 font-mono text-xs uppercase tracking-widest theme-accent-text font-medium">Start a Project ↗</a>
     </div>
   </header>
 
-  <main class="flex-1 pt-28 pb-20 sm:pt-32 sm:pb-24">
+  <main class="flex-1 pt-24 pb-16 sm:pt-32 sm:pb-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-14">
         <div>
           <a href="index.html" class="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest theme-accent-text hover:opacity-80 transition-opacity mb-3">
             ← Back to Home
@@ -153,18 +167,18 @@
         </div>
 
         <div class="inline-flex flex-wrap gap-2">
-          <button type="button" data-work-filter="all" class="work-filter-btn chip-active px-4 py-2 rounded-full border theme-border text-xs sm:text-sm font-medium cursor-pointer transition-all hover:border-[var(--accent)]">All (6)</button>
-          <button type="button" data-work-filter="systems" class="work-filter-btn px-4 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 cursor-pointer transition-all hover:border-[var(--accent)]">Business Systems</button>
-          <button type="button" data-work-filter="products" class="work-filter-btn px-4 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 cursor-pointer transition-all hover:border-[var(--accent)]">Apps &amp; Tools</button>
+          <button type="button" data-work-filter="all" class="work-filter-btn chip-active px-4 py-2.5 sm:py-2 rounded-full border theme-border text-xs sm:text-sm font-medium cursor-pointer transition-all hover:border-[var(--accent)]">All (6)</button>
+          <button type="button" data-work-filter="systems" class="work-filter-btn px-4 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 cursor-pointer transition-all hover:border-[var(--accent)]">Business Systems</button>
+          <button type="button" data-work-filter="products" class="work-filter-btn px-4 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 cursor-pointer transition-all hover:border-[var(--accent)]">Apps &amp; Tools</button>
         </div>
       </div>
 
-      <div id="workGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12"></div>
+      <div id="workGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 lg:gap-x-10 gap-y-8 sm:gap-y-12"></div>
     </div>
   </main>
 
   <footer class="border-t theme-border py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono theme-text opacity-70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-center sm:text-left text-xs font-mono theme-text opacity-70">
       <span>© 2026 Md. Sameer Sakib · B.Sc. CS, BRAC University</span>
       <span>Software + Performance Marketing · Dhaka &amp; Worldwide</span>
     </div>
@@ -241,6 +255,10 @@
         btn.classList.add('chip-active');
         render();
       });
+    });
+
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
     });
 
     render();

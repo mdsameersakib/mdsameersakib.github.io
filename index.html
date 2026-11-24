@@ -136,19 +136,25 @@
       display: inline-block;
       will-change: transform;
     }
-    .swap-slot {
-      position: relative;
-      display: inline-block;
-      vertical-align: top;
-      text-align: left;
+    .hero-grid-line {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
       overflow: hidden;
-      height: 1.14em;
+      line-height: 1.14;
+    }
+    .swap-slot {
+      display: inline-grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: baseline;
+      justify-items: start;
+      overflow: visible;
+      text-align: left;
       line-height: 1.14;
     }
     .swap-word {
-      position: absolute;
-      left: 0;
-      top: -0.074em;
+      grid-area: 1 / 1;
+      width: max-content;
       white-space: nowrap;
       line-height: 1.14;
       will-change: transform, opacity;
@@ -164,11 +170,11 @@
       transform: scaleX(0);
     }
 
-    /* Orbital Hero Visual */
+    /* Orbital Hero Visual — fluid auto-scaling with clear head/orbit separation on phones */
     .orb-wrap {
       position: relative;
-      width: 290px;
-      height: 290px;
+      width: clamp(242px, 68vw, 310px);
+      height: clamp(242px, 68vw, 310px);
       perspective: 950px;
       transform-style: preserve-3d;
     }
@@ -194,10 +200,10 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 40px;
-      height: 40px;
-      margin-left: -20px;
-      margin-top: -20px;
+      width: clamp(30px, 8.2vw, 40px);
+      height: clamp(30px, 8.2vw, 40px);
+      margin-left: calc(clamp(30px, 8.2vw, 40px) * -0.5);
+      margin-top: calc(clamp(30px, 8.2vw, 40px) * -0.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -205,6 +211,10 @@
       filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.38));
       will-change: transform, opacity;
       pointer-events: auto;
+    }
+    .orbit-logo svg {
+      width: 82%;
+      height: 82%;
     }
     @media (min-width: 1024px) {
       .orbit-logo { width: 44px; height: 44px; margin-left: -22px; margin-top: -22px; }
@@ -225,7 +235,7 @@
     }
     .orb-core {
       position: absolute;
-      inset: 6%;
+      inset: 8%;
       border-radius: 9999px;
       background: transparent;
       display: flex;
@@ -233,6 +243,9 @@
       justify-content: center;
       overflow: visible;
       z-index: 2;
+    }
+    @media (min-width: 640px) {
+      .orb-core { inset: 6%; }
     }
     #avatarCanvas {
       width: 100%;
@@ -282,7 +295,6 @@
       <nav class="hidden md:flex items-center gap-7 text-xs font-mono uppercase tracking-widest theme-muted">
         <a href="#services" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Services</a>
         <a href="#results" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Results</a>
-        <a href="work.html" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Work</a>
         <a href="#quote" class="hover:opacity-100 opacity-80 transition-opacity theme-text">Quote</a>
       </nav>
 
@@ -303,7 +315,7 @@
           <span aria-hidden="true">↗</span>
         </a>
 
-        <button id="mobileMenuBtn" type="button" aria-label="Toggle Menu" class="md:hidden p-2.5 rounded-full border theme-border theme-text">
+        <button id="mobileMenuBtn" type="button" aria-label="Toggle Menu" class="md:hidden w-10 h-10 rounded-full border theme-border theme-surface flex items-center justify-center theme-text">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
           </svg>
@@ -312,51 +324,49 @@
     </div>
 
     <!-- Mobile Drawer -->
-    <div id="mobileMenu" class="hidden md:hidden border-t theme-border theme-bg px-5 py-4 space-y-3 rounded-b-3xl">
-      <a href="#services" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-text opacity-85">Services</a>
-      <a href="#results" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-text opacity-85">Results</a>
-      <a href="work.html" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-text opacity-85">Work</a>
-      <a href="#quote" class="mobile-nav-link block font-mono text-xs uppercase tracking-widest theme-accent-text">Start a Project ↗</a>
+    <div id="mobileMenu" class="hidden md:hidden border-t theme-border theme-bg px-5 py-4 space-y-3.5 rounded-b-3xl shadow-xl">
+      <a href="#services" class="mobile-nav-link block py-1 font-mono text-xs uppercase tracking-widest theme-text opacity-90">Services</a>
+      <a href="#results" class="mobile-nav-link block py-1 font-mono text-xs uppercase tracking-widest theme-text opacity-90">Results</a>
+      <a href="#quote" class="mobile-nav-link block py-1 font-mono text-xs uppercase tracking-widest theme-accent-text font-medium">Start a Project ↗</a>
     </div>
   </header>
 
   <main id="top" class="relative z-10">
     <!-- HERO -->
-    <section id="heroSection" class="relative min-h-[94vh] pt-24 pb-10 flex flex-col justify-between grid-bg border-b theme-border overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto relative z-10">
-        <div class="relative flex flex-col items-center text-center pt-2">
-          <!-- Giant Editorial Backdrop Name -->
-          <div aria-hidden="true" class="pointer-events-none select-none absolute top-24 sm:top-20 lg:top-24 left-1/2 -translate-x-1/2 w-full text-center font-display font-extrabold uppercase tracking-tighter text-[clamp(2.5rem,9vw,8.75rem)] leading-[0.9] theme-accent-text opacity-[0.12] whitespace-nowrap">
-            Md. Sameer Sakib
-          </div>
+    <section id="heroSection" class="relative pt-24 pb-10 flex flex-col gap-9 lg:min-h-[94vh] lg:justify-between lg:gap-0 grid-bg border-b theme-border overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full lg:my-auto relative z-10">
+        <div class="relative flex flex-col items-center text-center pt-1 sm:pt-2">
+          <!-- Center 3D Character Orbital Visual with Locked Backdrop Name -->
+          <div class="relative w-full flex justify-center">
+            <div aria-hidden="true" class="pointer-events-none select-none absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[92vw] max-w-7xl text-center font-display font-extrabold uppercase tracking-tighter text-[clamp(1.65rem,7.4vw,8.75rem)] leading-[0.9] theme-accent-text opacity-[0.12] whitespace-nowrap z-0">
+              Md. Sameer Sakib
+            </div>
 
-          <!-- Center 3D Character Orbital Visual -->
-          <div class="relative z-10 flex justify-center">
-            <div id="heroOrb" class="orb-wrap hero-stagger">
-              <!-- 3D Orbital Rings: Back Arcs (behind avatar, dimmer & thinner) -->
+            <div id="heroOrb" class="orb-wrap hero-stagger relative z-10">
+              <!-- 3D Orbital Rings: Back Arcs (non-scaling-stroke keeps crisp weight on mobile) -->
               <svg class="orbit-svg orbit-svg-back" viewBox="-250 -250 500 500" fill="none" aria-hidden="true">
                 <g transform="rotate(-28)">
-                  <path d="M -216.67 0 A 216.67 81.16 0 0 1 216.67 0" stroke="var(--border)" stroke-width="0.6" stroke-opacity="0.45" />
+                  <path d="M -216.67 0 A 216.67 81.16 0 0 1 216.67 0" stroke="var(--border)" stroke-width="0.85" stroke-opacity="0.55" vector-effect="non-scaling-stroke" />
                 </g>
                 <g transform="rotate(28)">
-                  <path d="M -216.67 0 A 216.67 81.16 0 0 1 216.67 0" stroke="var(--border)" stroke-width="0.6" stroke-opacity="0.45" />
+                  <path d="M -216.67 0 A 216.67 81.16 0 0 1 216.67 0" stroke="var(--border)" stroke-width="0.85" stroke-opacity="0.55" vector-effect="non-scaling-stroke" />
                 </g>
               </svg>
 
-              <!-- 3D Orbital Rings: Front Arcs (in front of avatar, brighter & thicker) -->
+              <!-- 3D Orbital Rings: Front Arcs (crisp non-scaling coral gradient at all widths) -->
               <svg class="orbit-svg orbit-svg-front" viewBox="-250 -250 500 500" fill="none" aria-hidden="true">
                 <defs>
                   <linearGradient id="orbitFrontGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="var(--border)" stop-opacity="0.25" />
-                    <stop offset="50%" stop-color="var(--accent)" stop-opacity="0.75" />
-                    <stop offset="100%" stop-color="var(--border)" stop-opacity="0.25" />
+                    <stop offset="0%" stop-color="var(--border)" stop-opacity="0.35" />
+                    <stop offset="50%" stop-color="var(--accent)" stop-opacity="0.85" />
+                    <stop offset="100%" stop-color="var(--border)" stop-opacity="0.35" />
                   </linearGradient>
                 </defs>
                 <g transform="rotate(-28)">
-                  <path d="M 216.67 0 A 216.67 81.16 0 0 1 -216.67 0" stroke="url(#orbitFrontGrad)" stroke-width="1.0" stroke-linecap="round" />
+                  <path d="M 216.67 0 A 216.67 81.16 0 0 1 -216.67 0" stroke="url(#orbitFrontGrad)" stroke-width="1.25" stroke-linecap="round" vector-effect="non-scaling-stroke" />
                 </g>
                 <g transform="rotate(28)">
-                  <path d="M 216.67 0 A 216.67 81.16 0 0 1 -216.67 0" stroke="url(#orbitFrontGrad)" stroke-width="1.0" stroke-linecap="round" />
+                  <path d="M 216.67 0 A 216.67 81.16 0 0 1 -216.67 0" stroke="url(#orbitFrontGrad)" stroke-width="1.25" stroke-linecap="round" vector-effect="non-scaling-stroke" />
                 </g>
               </svg>
 
@@ -414,18 +424,18 @@
           </div>
 
           <!-- Centered Headline & Copy (keeps swap animation + synced blink) -->
-          <div class="mt-8 relative z-10 flex flex-col items-center">
-            <h1 class="font-display font-extrabold tracking-tight text-3xl sm:text-5xl lg:text-[4.25rem] leading-[1.14] theme-text">
+          <div class="mt-6 sm:mt-8 relative z-10 flex flex-col items-center">
+            <h1 class="font-display font-bold tracking-tight text-[clamp(1.85rem,7.8vw,4.25rem)] leading-[1.14] theme-text">
               <span class="sr-only">I Build Your Software, Scale Your Brand, and Run Your Ads</span>
               <span aria-hidden="true" class="line-mask block">
-                <span class="hero-line block"><span class="inline-block align-top">I</span> <span id="swapSlot1" class="swap-slot"><span class="swap-word swap-a">Build</span><span class="swap-word swap-b">Scale</span><span class="swap-word swap-c">Run</span></span></span>
+                <span class="hero-line hero-grid-line"><span>I&nbsp;</span><span id="swapSlot1" class="swap-slot"><span class="swap-word swap-a">Build</span><span class="swap-word swap-b">Scale</span><span class="swap-word swap-c">Run</span></span></span>
               </span>
               <span aria-hidden="true" class="line-mask block">
-                <span class="hero-line block"><span class="inline-block align-top">Your</span> <span id="swapSlot2" class="swap-slot font-bold theme-accent-text"><span class="swap-word swap-a">Software</span><span class="swap-word swap-b">Brand</span><span class="swap-word swap-c">Ads</span></span></span>
+                <span class="hero-line hero-grid-line"><span>Your&nbsp;</span><span id="swapSlot2" class="swap-slot theme-accent-text"><span class="swap-word swap-a">Software</span><span class="swap-word swap-b">Brand</span><span class="swap-word swap-c">Ads</span></span></span>
               </span>
             </h1>
 
-            <p class="hero-stagger mt-4 max-w-xl mx-auto text-base sm:text-lg theme-muted leading-relaxed">
+            <p class="hero-stagger mt-3.5 sm:mt-4 max-w-xl mx-auto text-sm sm:text-lg theme-text opacity-80 leading-relaxed">
               I build your website or software, set up tracking, and run your ads—all in one place.
             </p>
           </div>
@@ -433,74 +443,74 @@
       </div>
 
       <!-- Bottom Editorial Hairline Index -->
-      <div id="heroMetrics" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-10 relative z-10">
-        <div class="hero-stagger grid grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
-          <div class="metric-item pt-4 cursor-default">
-            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+      <div id="heroMetrics" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full lg:mt-10 relative z-10">
+        <div class="hero-stagger grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-2">
+          <div class="metric-item pt-3.5 sm:pt-4 cursor-default">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs font-medium uppercase tracking-wider theme-text opacity-80">
               <span>Software &amp; Apps</span>
               <span class="font-mono theme-accent-text opacity-100">01</span>
             </div>
-            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Websites, CRM &amp; POS</div>
+            <div class="metric-title mt-1.5 sm:mt-2 font-display font-bold text-sm sm:text-lg leading-snug">Websites, CRM &amp; POS</div>
           </div>
-          <div class="metric-item pt-4 cursor-default">
-            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+          <div class="metric-item pt-3.5 sm:pt-4 cursor-default">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs font-medium uppercase tracking-wider theme-text opacity-80">
               <span>Paid Ads</span>
               <span class="font-mono theme-accent-text opacity-100">02</span>
             </div>
-            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Meta · Google · TikTok</div>
+            <div class="metric-title mt-1.5 sm:mt-2 font-display font-bold text-sm sm:text-lg leading-snug">Meta · Google · TikTok</div>
           </div>
-          <div class="metric-item pt-4 cursor-default">
-            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+          <div class="metric-item pt-3.5 sm:pt-4 cursor-default">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs font-medium uppercase tracking-wider theme-text opacity-80">
               <span>Ad Tracking</span>
               <span class="font-mono theme-accent-text opacity-100">03</span>
             </div>
-            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Pixel &amp; CAPI Setup</div>
+            <div class="metric-title mt-1.5 sm:mt-2 font-display font-bold text-sm sm:text-lg leading-snug">Pixel &amp; CAPI Setup</div>
           </div>
-          <div class="metric-item pt-4 cursor-default">
-            <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wider theme-text opacity-80">
+          <div class="metric-item pt-3.5 sm:pt-4 cursor-default">
+            <div class="flex items-center justify-between text-[11px] sm:text-xs font-medium uppercase tracking-wider theme-text opacity-80">
               <span>Existing Sites</span>
               <span class="font-mono theme-accent-text opacity-100">04</span>
             </div>
-            <div class="metric-title mt-2 font-display font-bold text-base sm:text-lg">Upgrade Without Rebuilding</div>
+            <div class="metric-title mt-1.5 sm:mt-2 font-display font-bold text-sm sm:text-lg leading-snug">Upgrade Existing Sites</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 01 / THE BIG PICTURE -->
-    <section id="big-picture" class="py-24 sm:py-32 border-b theme-border relative overflow-hidden">
+    <section id="big-picture" class="py-16 sm:py-24 lg:py-28 border-b theme-border relative overflow-hidden">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-        <h2 class="scroll-fade font-display font-bold text-3xl sm:text-5xl lg:text-[3.25rem] tracking-tight leading-[1.1] theme-text">
+        <h2 class="scroll-fade font-display font-bold text-[1.75rem] sm:text-5xl lg:text-[3.25rem] tracking-tight leading-[1.12] theme-text">
           Most businesses don't need<br />
           another agency.<br />
           They just need everything to work<br />
           <span class="theme-accent-text">Simply and Efficiently.</span>
         </h2>
 
-        <p class="scroll-fade mt-6 max-w-2xl text-base sm:text-xl theme-muted leading-relaxed">
+        <p class="scroll-fade mt-5 sm:mt-6 max-w-2xl text-sm sm:text-xl theme-text opacity-80 leading-relaxed">
           I connect the technology behind your business with the marketing that brings people to it — from the first ad click to the systems that keep customers moving.
         </p>
 
         <!-- Connected 3-Step Flow -->
-        <div class="scroll-fade mt-10 w-full max-w-2xl grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="metric-item pt-3 text-center">
+        <div class="scroll-fade mt-8 sm:mt-10 w-full max-w-2xl grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3">
+          <div class="metric-item pt-3.5 sm:pt-3 text-center">
             <div class="font-mono text-[11px] uppercase tracking-widest theme-accent-text">First Click</div>
-            <div class="metric-title mt-1 font-display font-bold text-sm sm:text-base">Targeted Paid Ads</div>
+            <div class="metric-title mt-1 font-display font-bold text-base">Targeted Paid Ads</div>
           </div>
-          <div class="metric-item pt-3 text-center">
+          <div class="metric-item pt-3.5 sm:pt-3 text-center">
             <div class="font-mono text-[11px] uppercase tracking-widest theme-accent-text">Conversion</div>
-            <div class="metric-title mt-1 font-display font-bold text-sm sm:text-base">Fast Sites &amp; Stores</div>
+            <div class="metric-title mt-1 font-display font-bold text-base">Fast Sites &amp; Stores</div>
           </div>
-          <div class="metric-item pt-3 text-center">
+          <div class="metric-item pt-3.5 sm:pt-3 text-center">
             <div class="font-mono text-[11px] uppercase tracking-widest theme-accent-text">Retention</div>
-            <div class="metric-title mt-1 font-display font-bold text-sm sm:text-base">Tracking &amp; CRM Flow</div>
+            <div class="metric-title mt-1 font-display font-bold text-base">Tracking &amp; CRM Flow</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- SERVICES -->
-    <section id="services" class="py-20 sm:py-24 border-b theme-border">
+    <section id="services" class="py-16 sm:py-20 lg:py-24 border-b theme-border">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-2xl mx-auto">
           <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight theme-text">
@@ -561,11 +571,11 @@
         </div>
 
         <!-- Clean Hairline Upgrade Strip -->
-        <div class="scroll-fade metric-item mt-14 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="scroll-fade metric-item mt-12 sm:mt-14 pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <p class="text-sm sm:text-base theme-text opacity-85 leading-relaxed">
             <strong class="theme-text">Already have an existing website or brand?</strong> I can plug in right away to run campaigns, fix tracking, or ship new features.
           </p>
-          <a href="#quote" class="shrink-0 px-5 py-2.5 rounded-full theme-surface border theme-border text-sm font-medium theme-text hover:border-[var(--accent)] transition">
+          <a href="#quote" class="shrink-0 w-full sm:w-auto text-center px-5 py-2.5 rounded-full theme-surface border theme-border text-sm font-medium theme-text hover:border-[var(--accent)] transition">
             Upgrade Existing ↗
           </a>
         </div>
@@ -573,7 +583,7 @@
     </section>
 
     <!-- RESULTS & GROWTH LOOP -->
-    <section id="results" class="py-20 sm:py-24 border-b theme-border">
+    <section id="results" class="py-16 sm:py-20 lg:py-24 border-b theme-border">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <!-- Left: Editorial Summary & 4-Step Hairline Loop -->
@@ -676,7 +686,7 @@
     </section>
 
     <!-- WHY WORK WITH ME -->
-    <section id="why-me" class="py-20 sm:py-24 border-b theme-border">
+    <section id="why-me" class="py-16 sm:py-20 lg:py-24 border-b theme-border">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto">
           <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight leading-[1.08] theme-text">
@@ -687,8 +697,8 @@
           </p>
         </div>
 
-        <!-- 3 Polite Brutal Truths -->
-        <div class="scroll-fade mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- 4 Core Principles (2x2 Balanced Grid) -->
+        <div class="scroll-fade mt-10 sm:mt-14 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           <div class="metric-item pt-5 cursor-default">
             <h3 class="metric-title font-display font-bold text-xl">I don't take every client.</h3>
             <p class="mt-2 text-sm sm:text-base theme-text opacity-80 leading-relaxed">
@@ -707,44 +717,50 @@
               If your offer, site, or pricing isn't ready for traffic, I'll tell you upfront instead of burning your budget just to bill a retainer.
             </p>
           </div>
+          <div class="metric-item pt-5 cursor-default">
+            <h3 class="metric-title font-display font-bold text-xl">Confidentiality comes standard.</h3>
+            <p class="mt-2 text-sm sm:text-base theme-text opacity-80 leading-relaxed">
+              I'm happy to work under NDA—your systems, business data, and strategy are never shared with anyone else. That's why I keep client names, custom builds, and live campaign views private and only share anonymized results.
+            </p>
+          </div>
         </div>
 
-        <!-- Typical Agency vs. Working With Me Table (Proportional Columns) -->
-        <div class="scroll-fade mt-16">
+        <!-- Typical Agency vs. Working With Me Table (Proportional Columns + Mobile Stacked Badges) -->
+        <div class="scroll-fade mt-12 sm:mt-16">
           <div class="hidden md:grid md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-6 pb-3.5 text-sm font-semibold uppercase tracking-wider">
             <div class="theme-text opacity-70">What Matters</div>
             <div class="theme-text opacity-70">Typical Agency</div>
             <div class="theme-accent-text">Working With Me</div>
           </div>
 
-          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-2 md:gap-6 items-baseline">
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-3 md:gap-6 items-baseline">
             <div class="font-semibold text-lg theme-text">Who works on your account</div>
-            <div class="text-base theme-text opacity-75"><span class="md:hidden font-semibold theme-text">Agency: </span>Sold by seniors, handed off to junior managers</div>
-            <div class="text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>One person—I write the code and run the ads</div>
+            <div class="text-sm sm:text-base theme-text opacity-75"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider opacity-70 mb-0.5">Typical Agency</span>Sold by seniors, handed off to junior managers</div>
+            <div class="text-sm sm:text-base theme-text font-medium"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider theme-accent-text mb-0.5">Working With Me</span>One person—I write the code and run the ads</div>
           </div>
-          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-2 md:gap-6 items-baseline">
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-3 md:gap-6 items-baseline">
             <div class="font-semibold text-lg theme-text">When something breaks</div>
-            <div class="text-base theme-text opacity-75"><span class="md:hidden font-semibold theme-text">Agency: </span>Dev blames marketing; marketing blames tracking</div>
-            <div class="text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>Zero finger-pointing—I fix the full chain myself</div>
+            <div class="text-sm sm:text-base theme-text opacity-75"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider opacity-70 mb-0.5">Typical Agency</span>Dev blames marketing; marketing blames tracking</div>
+            <div class="text-sm sm:text-base theme-text font-medium"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider theme-accent-text mb-0.5">Working With Me</span>Zero finger-pointing—I fix the full chain myself</div>
           </div>
-          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-2 md:gap-6 items-baseline">
+          <div class="metric-item py-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-3 md:gap-6 items-baseline">
             <div class="font-semibold text-lg theme-text">Client capacity</div>
-            <div class="text-base theme-text opacity-75"><span class="md:hidden font-semibold theme-text">Agency: </span>20–40 clients per manager, rushed templates</div>
-            <div class="text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>Small selective roster, deep priority per brand</div>
+            <div class="text-sm sm:text-base theme-text opacity-75"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider opacity-70 mb-0.5">Typical Agency</span>20–40 clients per manager, rushed templates</div>
+            <div class="text-sm sm:text-base theme-text font-medium"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider theme-accent-text mb-0.5">Working With Me</span>Small selective roster, deep priority per brand</div>
           </div>
-          <div class="metric-item pt-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-2 md:gap-6 items-baseline">
+          <div class="metric-item pt-5 grid grid-cols-1 md:grid-cols-[0.85fr_1.05fr_1.1fr] gap-3 md:gap-6 items-baseline">
             <div class="font-semibold text-lg theme-text">Reporting &amp; focus</div>
-            <div class="text-base theme-text opacity-75"><span class="md:hidden font-semibold theme-text">Agency: </span>Vanity slides full of clicks and impressions</div>
-            <div class="text-base theme-text font-medium"><span class="md:hidden font-semibold theme-accent-text">With Me: </span>Working systems and real tracked revenue</div>
+            <div class="text-sm sm:text-base theme-text opacity-75"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider opacity-70 mb-0.5">Typical Agency</span>Vanity slides full of clicks and impressions</div>
+            <div class="text-sm sm:text-base theme-text font-medium"><span class="md:hidden block font-mono text-[11px] uppercase tracking-wider theme-accent-text mb-0.5">Working With Me</span>Working systems and real tracked revenue</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- PROCESS TIMELINE -->
-    <section id="process" class="py-20 sm:py-24 border-b theme-border">
+    <section id="process" class="py-16 sm:py-20 lg:py-24 border-b theme-border">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto mb-14">
+        <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
           <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight theme-text">
             Three simple steps.
           </h2>
@@ -782,9 +798,9 @@
     </section>
 
     <!-- INTERACTIVE QUOTE & CONTACT BUILDER -->
-    <section id="quote" class="py-20 sm:py-24">
+    <section id="quote" class="py-16 sm:py-20 lg:py-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-2xl mx-auto mb-14">
+        <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
           <h2 class="split-reveal font-display font-bold text-3xl sm:text-5xl tracking-tight theme-text">
             Pick what you need.
           </h2>
@@ -793,7 +809,7 @@
           </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
           <!-- Left: Editorial Hairline Builder -->
           <div class="lg:col-span-7 flex flex-col justify-between space-y-6 reveal-block">
             <div class="metric-item pt-4">
@@ -802,10 +818,10 @@
                 <span class="font-mono text-xs theme-accent-text">01</span>
               </div>
               <div class="flex flex-wrap gap-2.5">
-                <button type="button" data-origin="Build from scratch" class="origin-chip chip-active px-4 py-2 rounded-full border theme-border text-sm font-medium transition-all hover:border-[var(--accent)]">
+                <button type="button" data-origin="Build from scratch" class="origin-chip chip-active px-4 py-2.5 sm:py-2 rounded-full border theme-border text-sm font-medium transition-all hover:border-[var(--accent)]">
                   Build from Scratch
                 </button>
-                <button type="button" data-origin="Upgrade existing website or campaigns" class="origin-chip px-4 py-2 rounded-full border theme-border theme-surface text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">
+                <button type="button" data-origin="Upgrade existing website or campaigns" class="origin-chip px-4 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">
                   Upgrade Existing Site / Campaigns
                 </button>
               </div>
@@ -817,13 +833,13 @@
                 <span class="font-mono text-xs theme-accent-text">02</span>
               </div>
               <div class="flex flex-wrap gap-2.5">
-                <button type="button" data-market="Bangladesh" class="market-chip chip-active px-4 py-2 rounded-full border theme-border text-sm font-medium transition-all hover:border-[var(--accent)]">
+                <button type="button" data-market="Bangladesh" class="market-chip chip-active px-4 py-2.5 sm:py-2 rounded-full border theme-border text-sm font-medium transition-all hover:border-[var(--accent)]">
                   Bangladesh
                 </button>
-                <button type="button" data-market="International" class="market-chip px-4 py-2 rounded-full border theme-border theme-surface text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">
+                <button type="button" data-market="International" class="market-chip px-4 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">
                   International
                 </button>
-                <button type="button" data-market="Both (BD & Global)" class="market-chip px-4 py-2 rounded-full border theme-border theme-surface text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">
+                <button type="button" data-market="Both (BD & Global)" class="market-chip px-4 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">
                   Both
                 </button>
               </div>
@@ -835,16 +851,16 @@
                 <span class="font-mono text-xs theme-accent-text">03</span>
               </div>
               <div id="quoteServiceChips" class="flex flex-wrap gap-2">
-                <button type="button" data-qservice="Custom Web App / CRM / POS" class="qservice-chip chip-active px-3.5 py-2 rounded-full border theme-border text-xs sm:text-sm font-medium transition-all hover:border-[var(--accent)]">Custom Web App / CRM / POS</button>
-                <button type="button" data-qservice="Conversion Landing Page" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Conversion Landing Page</button>
-                <button type="button" data-qservice="E-Commerce Store" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">E-Commerce Store</button>
-                <button type="button" data-qservice="UI/UX Design" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">UI/UX Design</button>
-                <button type="button" data-qservice="Meta Ads" class="qservice-chip chip-active px-3.5 py-2 rounded-full border theme-border text-xs sm:text-sm font-medium transition-all hover:border-[var(--accent)]">Meta Ads</button>
-                <button type="button" data-qservice="Google Ads" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Google Ads</button>
-                <button type="button" data-qservice="TikTok Ads" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">TikTok Ads</button>
-                <button type="button" data-qservice="Pixel & CAPI Tracking" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Pixel &amp; CAPI Tracking</button>
-                <button type="button" data-qservice="Creative Strategy & Full-Funnel" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Creative Strategy &amp; Funnel</button>
-                <button type="button" data-qservice="Monthly Growth Retainer" class="qservice-chip px-3.5 py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Monthly Growth Retainer</button>
+                <button type="button" data-qservice="Custom Web App / CRM / POS" class="qservice-chip chip-active px-3.5 py-2.5 sm:py-2 rounded-full border theme-border text-xs sm:text-sm font-medium transition-all hover:border-[var(--accent)]">Custom Web App / CRM / POS</button>
+                <button type="button" data-qservice="Conversion Landing Page" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Conversion Landing Page</button>
+                <button type="button" data-qservice="E-Commerce Store" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">E-Commerce Store</button>
+                <button type="button" data-qservice="UI/UX Design" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">UI/UX Design</button>
+                <button type="button" data-qservice="Meta Ads" class="qservice-chip chip-active px-3.5 py-2.5 sm:py-2 rounded-full border theme-border text-xs sm:text-sm font-medium transition-all hover:border-[var(--accent)]">Meta Ads</button>
+                <button type="button" data-qservice="Google Ads" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Google Ads</button>
+                <button type="button" data-qservice="TikTok Ads" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">TikTok Ads</button>
+                <button type="button" data-qservice="Pixel & CAPI Tracking" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Pixel &amp; CAPI Tracking</button>
+                <button type="button" data-qservice="Creative Strategy & Full-Funnel" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Creative Strategy &amp; Funnel</button>
+                <button type="button" data-qservice="Monthly Growth Retainer" class="qservice-chip px-3.5 py-2.5 sm:py-2 rounded-full border theme-border theme-surface text-xs sm:text-sm font-medium theme-text opacity-80 hover:opacity-100 transition-all hover:border-[var(--accent)]">Monthly Growth Retainer</button>
               </div>
             </div>
 
@@ -858,14 +874,14 @@
           </div>
 
           <!-- Right: Equal-Height Live Brief Summary Ledger -->
-          <div class="lg:col-span-5 flex flex-col justify-between rounded-3xl border theme-border theme-surface p-6 sm:p-8 reveal-block">
+          <div class="lg:col-span-5 flex flex-col justify-between rounded-3xl border theme-border theme-surface p-5 sm:p-8 reveal-block">
             <div class="flex-1 flex flex-col">
-              <div class="flex items-center justify-between pb-4 border-b theme-border">
+              <div class="flex items-center justify-between gap-2 pb-4 border-b theme-border">
                 <span class="font-display font-bold text-lg theme-text">Live Brief Preview</span>
-                <span class="px-3 py-1 rounded-full theme-accent-soft font-mono text-[11px] uppercase tracking-wider theme-accent-text">Ready to Send</span>
+                <span class="shrink-0 px-3 py-1 rounded-full theme-accent-soft font-mono text-[11px] uppercase tracking-wider theme-accent-text">Ready to Send</span>
               </div>
 
-              <div id="briefPreview" class="mt-5 flex-1 min-h-[148px] flex items-center p-4 rounded-2xl theme-surface-2 border theme-border text-sm theme-text leading-relaxed whitespace-pre-line"></div>
+              <div id="briefPreview" class="mt-5 flex-1 min-h-[120px] sm:min-h-[148px] flex items-center p-4 rounded-2xl theme-surface-2 border theme-border text-sm theme-text leading-relaxed whitespace-pre-line"></div>
             </div>
 
             <div class="mt-6">
@@ -903,14 +919,14 @@
 
   <!-- Footer -->
   <footer class="border-t theme-border py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono theme-muted">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 text-center sm:text-left text-xs font-mono theme-muted">
       <span>© 2026 Md. Sameer Sakib · B.Sc. CS, BRAC University</span>
       <span>Software + Performance Marketing · Dhaka &amp; Worldwide</span>
     </div>
   </footer>
 
   <!-- Toast Notification -->
-  <div id="toast" class="pointer-events-none fixed bottom-6 right-6 z-50 opacity-0 translate-y-3 transition-all duration-300 px-4 py-3 rounded-full theme-accent font-mono text-xs font-medium shadow-lg">
+  <div id="toast" class="pointer-events-none fixed bottom-4 left-4 right-4 sm:left-auto sm:bottom-6 sm:right-6 z-50 opacity-0 translate-y-3 transition-all duration-300 px-4 py-3 rounded-full theme-accent font-mono text-xs font-medium text-center shadow-lg">
     Copied to clipboard
   </div>
 
