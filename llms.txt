@@ -1,6 +1,6 @@
 # Md. Sameer Sakib
 
-> Software Engineer & Performance Marketer based in Dhaka, Bangladesh (serving Bangladesh & worldwide). I build fast websites, e-commerce stores, and custom business software (CRM, ERP, HR, POS), configure browser & server-side tracking (Pixel, CAPI, GA4), and manage Meta, Google, and TikTok ad campaigns—all in one place.
+> Digital Marketer & Software Engineer based in Dhaka, Bangladesh (serving Bangladesh & worldwide). I build fast websites, e-commerce stores, and custom business software (CRM, ERP, HR, POS), configure browser & server-side tracking (Pixel, CAPI, GA4), and manage Meta, Google, and TikTok ad campaigns—all in one place.
 
 ## Core Services
 
@@ -9,7 +9,7 @@
 - **Custom Business Software (Buy Outright or SaaS):** Tailored CRM, ERP, HR, POS, and internal workflow tools.
 - **Existing Site Upgrades:** UI improvements, speed optimization, and new feature development without a full rebuild.
 
-### Performance Marketing & Tracking
+### Performance & Digital Marketing
 - **Paid Ads Management:** Meta Ads (Facebook & Instagram), Google Ads, and TikTok Ads structured and optimized daily for profitable leads and orders.
 - **Server-Side Tracking & Attribution:** Meta Pixel, Conversions API (CAPI), and Google Analytics 4 setup so ad algorithms receive accurate purchase and lead signals.
 - **Creative Testing & Scaling:** Ongoing ad creative iteration, funnel optimization, and weekly performance reporting.
@@ -22,6 +22,12 @@
 - **45.2K Link Clicks** and 162.3K site visits
 
 *Note: Benchmarks reflect top achieved client performance and vary by product, ad spend, and market.*
+
+## Frequently Asked Questions
+- **Outside Dhaka / International:** Based in Dhaka, Bangladesh; works with both local Bangladeshi brands and global clients.
+- **Existing Sites & Campaigns:** Can plug into an existing website to fix Meta Pixel/CAPI/GA4 tracking and run campaigns without a full rebuild.
+- **Software Ownership:** Offers custom CRM, ERP, HR, and POS software for outright purchase or managed SaaS subscription (conditions apply).
+- **NDA & Confidentiality:** Operates under NDA; keeps client brand names, custom builds, and live dashboards private while sharing anonymized metrics.
 
 ## Background & Contact
 - [Portfolio Website](https://mdsameersakib.pro.bd/) — Main portfolio & project brief builder
