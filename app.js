@@ -117,7 +117,6 @@ function applyAccent() {
   root.style.setProperty('--accent-ink', palette.ink);
   root.style.setProperty('--accent-soft', palette.soft);
   root.style.setProperty('--accent-glow', palette.glow);
-  if (typeof updateAvatarAccent === 'function') updateAvatarAccent(palette.accent);
 }
 
 function applyTheme(theme) {
@@ -167,21 +166,25 @@ function toggleThemeWithRipple() {
     }).catch(() => {});
   } else {
     const overlay = document.getElementById('rippleOverlay');
-    overlay.style.backgroundColor = nextTheme === 'light' ? '#F6F6F2' : '#09090B';
-    overlay.style.opacity = '1';
-    gsap.fromTo(
-      overlay,
-      { clipPath: `circle(0px at ${x}px ${y}px)` },
-      {
-        clipPath: `circle(${endRadius}px at ${x}px ${y}px)`,
-        duration: 0.55,
-        ease: 'power3.inOut',
-        onComplete: () => {
-          applyTheme(nextTheme);
-          gsap.to(overlay, { opacity: 0, duration: 0.25 });
-        },
-      }
-    );
+    if (overlay && overlay.animate) {
+      overlay.style.backgroundColor = nextTheme === 'light' ? '#F6F6F2' : '#09090B';
+      overlay.style.opacity = '1';
+      const anim = overlay.animate(
+        [
+          { clipPath: `circle(0px at ${x}px ${y}px)` },
+          { clipPath: `circle(${endRadius}px at ${x}px ${y}px)` },
+        ],
+        { duration: 550, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards' }
+      );
+      anim.onfinish = () => {
+        applyTheme(nextTheme);
+        overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, fill: 'forwards' }).onfinish = () => {
+          overlay.style.opacity = '0';
+        };
+      };
+    } else {
+      applyTheme(nextTheme);
+    }
   }
 }
 
@@ -293,9 +296,11 @@ function initScrollProgressAndParallax() {
   let maxScroll = 1;
   let vh = window.innerHeight || 1;
   let parallaxMetrics = [];
+  let boundsMeasured = false;
   let rafPending = false;
 
   const measureScrollBounds = () => {
+    boundsMeasured = true;
     vh = window.innerHeight || 1;
     maxScroll = Math.max(1, document.documentElement.scrollHeight - vh);
     if (!reduceMotion && desktopQuery.matches && parallaxEls.length) {
@@ -315,6 +320,7 @@ function initScrollProgressAndParallax() {
 
   const updateOnScroll = () => {
     rafPending = false;
+    if (!boundsMeasured) measureScrollBounds();
     const sy = window.scrollY || window.pageYOffset || 0;
     if (progressBar) {
       const progress = Math.min(1, Math.max(0, sy / maxScroll));
@@ -336,14 +342,15 @@ function initScrollProgressAndParallax() {
     requestAnimationFrame(updateOnScroll);
   };
 
-  measureScrollBounds();
-  updateOnScroll();
+  if ((window.scrollY || window.pageYOffset || 0) > 0) {
+    scheduleUpdate();
+  }
 
   window.addEventListener('scroll', scheduleUpdate, { passive: true });
   window.addEventListener('resize', () => {
     requestAnimationFrame(() => {
       measureScrollBounds();
-      scheduleUpdate();
+      updateOnScroll();
     });
   }, { passive: true });
 }
@@ -371,254 +378,160 @@ function updateBrief() {
   return brief;
 }
 
-// ----- MAGNETIC BUTTONS -----
+// ----- MAGNETIC BUTTONS (DESKTOP FINE POINTER ONLY, ZERO GSAP) -----
 function initMagneticButtons() {
-  if (typeof gsap === 'undefined' || window.matchMedia('(hover: none)').matches) return;
+  if (window.matchMedia('(hover: none)').matches) return;
   document.querySelectorAll('.magnetic-btn').forEach(btn => {
-    const xTo = gsap.quickTo(btn, 'x', { duration: 0.35, ease: 'power3.out' });
-    const yTo = gsap.quickTo(btn, 'y', { duration: 0.35, ease: 'power3.out' });
-
+    let tx = 0;
+    let ty = 0;
+    let rafId = 0;
+    const flush = () => {
+      rafId = 0;
+      btn.style.transform = `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0)`;
+    };
     btn.addEventListener('mousemove', (e) => {
       const rect = btn.getBoundingClientRect();
-      const relX = e.clientX - (rect.left + rect.width / 2);
-      const relY = e.clientY - (rect.top + rect.height / 2);
-      xTo(relX * 0.22);
-      yTo(relY * 0.22);
+      tx = (e.clientX - (rect.left + rect.width / 2)) * 0.22;
+      ty = (e.clientY - (rect.top + rect.height / 2)) * 0.22;
+      if (!rafId) rafId = requestAnimationFrame(flush);
     });
     btn.addEventListener('mouseleave', () => {
-      xTo(0);
-      yTo(0);
+      tx = 0;
+      ty = 0;
+      if (!rafId) rafId = requestAnimationFrame(flush);
     });
   });
 }
 
-// ----- NATIVE WEBGL PORTRAIT WITH ON-DEMAND RENDER & SYNCED BLINKING (ZERO THREE.JS DEPENDENCY) -----
-let requestAvatarRender = null;
-let updateAvatarAccentFn = null;
+// ----- LIGHTWEIGHT 2D AVATAR EYE BLINK OVERLAY (ZERO WEBGL BOOT COST) -----
 let isHeroVisible = true;
 
-function parseHexColor(hex) {
-  const clean = (hex || '#FF6B4A').replace('#', '');
-  const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
-  const num = parseInt(full, 16);
-  if (Number.isNaN(num)) return [1.0, 0.42, 0.29];
-  return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
-}
+function initAvatarBlink() {
+  const img = document.getElementById('avatarImg');
+  const canvas = document.getElementById('avatarBlinkCanvas');
+  if (!img || !canvas) return;
 
-function updateAvatarAccent(hex) {
-  if (updateAvatarAccentFn) updateAvatarAccentFn(parseHexColor(hex));
-}
+  let ctx = null;
+  let lidTone = 'rgb(214, 158, 132)';
+  let toneSampled = false;
+  let blinkAnimId = 0;
 
-function initWebGLAvatar() {
-  const canvas = document.getElementById('avatarCanvas');
-  if (!canvas) return;
-
-  const gl = canvas.getContext('webgl', {
-    alpha: true,
-    antialias: true,
-    premultipliedAlpha: false,
-    powerPreference: 'low-power',
-  });
-  if (!gl) return;
-
-  const wrap = canvas.parentElement;
-  const getDpr = () => Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.5 : 2);
-
-  const vertSrc = `
-    attribute vec2 aPos;
-    uniform float uAspect;
-    varying vec2 vUv;
-    void main() {
-      vUv = aPos * 0.5 + 0.5;
-      // Match Three.js camera(32deg, z=4.4) + PlaneGeometry(2.48) + offset(y=-0.04)
-      float scaleY = 0.982817;
-      float scaleX = scaleY / max(uAspect, 0.01);
-      float offsetY = -0.031704;
-      gl_Position = vec4(aPos.x * scaleX, aPos.y * scaleY + offsetY, 0.0, 1.0);
-    }
-  `;
-
-  const fragSrc = `
-    precision mediump float;
-    uniform sampler2D uColorMap;
-    uniform vec3 uAccent;
-    uniform float uBlink;
-    varying vec2 vUv;
-
-    float eyeMask(vec2 uv, vec2 center, vec2 radii) {
-      vec2 d = (uv - center) / radii;
-      return smoothstep(1.0, 0.28, length(d));
-    }
-
-    void main() {
-      vec4 texel = texture2D(uColorMap, vUv);
-      if (texel.a < 0.02) discard;
-
-      if (uBlink > 0.001) {
-        vec2 leftEye = vec2(0.4102, 0.5850);
-        vec2 leftRadii = vec2(0.042, 0.025);
-        vec2 rightEye = vec2(0.5625, 0.5850);
-        vec2 rightRadii = vec2(0.040, 0.025);
-        float mEye = clamp(eyeMask(vUv, leftEye, leftRadii) + eyeMask(vUv, rightEye, rightRadii), 0.0, 1.0);
-        if (mEye > 0.01) {
-          float eyeTop = 0.608;
-          float eyeBot = 0.564;
-          float lidY = mix(eyeTop, eyeBot, uBlink);
-          float lidMask = smoothstep(lidY - 0.005, lidY + 0.003, vUv.y) * mEye;
-          float lashMask = exp(-pow((vUv.y - lidY) / 0.0032, 2.0)) * mEye * smoothstep(0.02, 0.15, uBlink);
-          vec3 lidColor = texture2D(uColorMap, vec2(vUv.x, 0.556)).rgb * 0.96;
-          texel.rgb = mix(texel.rgb, lidColor, lidMask * 0.96);
-          texel.rgb = mix(texel.rgb, vec3(0.14, 0.08, 0.06), lashMask * 0.72);
-        }
+  const sampleSkinTone = () => {
+    if (toneSampled || !img.complete || !img.naturalWidth) return;
+    toneSampled = true;
+    try {
+      const s = document.createElement('canvas');
+      s.width = 64;
+      s.height = 64;
+      const sctx = s.getContext('2d', { willReadFrequently: true });
+      sctx.drawImage(img, 0, 0, 64, 64);
+      const px = sctx.getImageData(Math.round(64 * 0.48), Math.round(64 * 0.444), 1, 1).data;
+      if (px[3] > 20) {
+        lidTone = `rgb(${Math.round(px[0] * 0.96)}, ${Math.round(px[1] * 0.96)}, ${Math.round(px[2] * 0.96)})`;
       }
+    } catch (e) {}
+  };
 
-      vec2 rimOffset = vec2(0.010, -0.006);
-      float neighborAlpha = texture2D(uColorMap, clamp(vUv + rimOffset, 0.0, 1.0)).a;
-      float rimMask = clamp((texel.a - neighborAlpha) * 1.4, 0.0, 1.0);
-      vec3 finalRgb = texel.rgb + uAccent * rimMask * 0.28;
-
-      gl_FragColor = vec4(finalRgb, texel.a);
+  const drawBlink = (t) => {
+    if (!ctx) {
+      canvas.width = 256;
+      canvas.height = 256;
+      ctx = canvas.getContext('2d');
+      sampleSkinTone();
     }
-  `;
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    if (t <= 0.01) return;
 
-  const compile = (type, src) => {
-    const sh = gl.createShader(type);
-    gl.shaderSource(sh, src);
-    gl.compileShader(sh);
-    return sh;
-  };
-  const prog = gl.createProgram();
-  gl.attachShader(prog, compile(gl.VERTEX_SHADER, vertSrc));
-  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fragSrc));
-  gl.linkProgram(prog);
-  gl.useProgram(prog);
+    const eyes = [
+      { cx: 0.4102 * w, cy: 0.415 * h, rx: 0.042 * w, ry: 0.025 * h },
+      { cx: 0.5625 * w, cy: 0.415 * h, rx: 0.040 * w, ry: 0.025 * h },
+    ];
+    const lidY = (0.392 + (0.436 - 0.392) * t) * h;
 
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-  const aPosLoc = gl.getAttribLocation(prog, 'aPos');
-  gl.enableVertexAttribArray(aPosLoc);
-  gl.vertexAttribPointer(aPosLoc, 2, gl.FLOAT, false, 0, 0);
+    eyes.forEach((eye) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(eye.cx, eye.cy, eye.rx, eye.ry, 0, 0, Math.PI * 2);
+      ctx.clip();
 
-  const uAspectLoc = gl.getUniformLocation(prog, 'uAspect');
-  const uColorMapLoc = gl.getUniformLocation(prog, 'uColorMap');
-  const uAccentLoc = gl.getUniformLocation(prog, 'uAccent');
-  const uBlinkLoc = gl.getUniformLocation(prog, 'uBlink');
+      ctx.fillStyle = lidTone;
+      ctx.fillRect(eye.cx - eye.rx, eye.cy - eye.ry, eye.rx * 2, Math.max(0, lidY - (eye.cy - eye.ry)));
 
-  let texReady = false;
-  let accentVec = parseHexColor(getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#FF6B4A');
-  const blinkState = { value: 0 };
-
-  gl.uniform3fv(uAccentLoc, accentVec);
-  gl.uniform1f(uBlinkLoc, 0);
-  gl.uniform1i(uColorMapLoc, 0);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-  let cachedW = 0;
-  let cachedH = 0;
-  const syncSize = (w, h) => {
-    const nw = Math.round(w || cachedW || wrap.clientWidth || 300);
-    const nh = Math.round(h || cachedH || wrap.clientHeight || 300);
-    cachedW = nw;
-    cachedH = nh;
-    const dpr = getDpr();
-    const pw = Math.round(nw * dpr);
-    const ph = Math.round(nh * dpr);
-    if (canvas.width !== pw || canvas.height !== ph) {
-      canvas.width = pw;
-      canvas.height = ph;
-    }
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.uniform1f(uAspectLoc, nw / nh);
-  };
-
-  const renderFrame = () => {
-    if (!texReady) return;
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform3fv(uAccentLoc, accentVec);
-    gl.uniform1f(uBlinkLoc, blinkState.value);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  };
-
-  requestAvatarRender = renderFrame;
-  updateAvatarAccentFn = (rgb) => {
-    accentVec = rgb;
-    renderFrame();
-  };
-
-  const tex = gl.createTexture();
-  const loadImageTex = (src, fallbackSrc) => {
-    const img = new Image();
-    img.onload = () => {
-      gl.bindTexture(gl.TEXTURE_2D, tex);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      texReady = true;
-      requestAnimationFrame(() => {
-        syncSize();
-        renderFrame();
-      });
-    };
-    if (fallbackSrc) {
-      img.onerror = () => loadImageTex(fallbackSrc, null);
-    }
-    img.src = src;
-  };
-  loadImageTex('./avatar.webp', './avatar.png');
-
-  window.triggerAvatarBlink = () => {
-    if (!isHeroVisible || document.hidden || typeof gsap === 'undefined') return;
-    gsap.fromTo(blinkState, { value: 0 }, {
-      value: 1,
-      duration: 0.11,
-      yoyo: true,
-      repeat: 1,
-      ease: 'power2.inOut',
-      overwrite: true,
-      onUpdate: renderFrame,
-      onComplete: renderFrame,
+      if (t > 0.05) {
+        ctx.strokeStyle = 'rgba(36, 20, 15, 0.72)';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(eye.cx - eye.rx, lidY);
+        ctx.lineTo(eye.cx + eye.rx, lidY);
+        ctx.stroke();
+      }
+      ctx.restore();
     });
   };
 
-  const ro = new ResizeObserver((entries) => {
-    const rect = entries[0] && entries[0].contentRect;
-    syncSize(rect && rect.width, rect && rect.height);
-    renderFrame();
-  });
-  ro.observe(wrap);
+  window.triggerAvatarBlink = () => {
+    if (!isHeroVisible || document.hidden || !img.complete) return;
+    if (blinkAnimId) cancelAnimationFrame(blinkAnimId);
+    const start = performance.now();
+    const dur = 220;
+    const step = (now) => {
+      const elapsed = now - start;
+      if (elapsed >= dur) {
+        drawBlink(0);
+        blinkAnimId = 0;
+        return;
+      }
+      const p = elapsed / dur;
+      const val = Math.sin(p * Math.PI);
+      drawBlink(val);
+      blinkAnimId = requestAnimationFrame(step);
+    };
+    blinkAnimId = requestAnimationFrame(step);
+  };
 }
 
-// ----- INIT LENIS + GSAP + EVENTS -----
-window.addEventListener('DOMContentLoaded', () => {
-  applyTheme(currentTheme);
-  updateBrief();
+// ----- INIT LENIS (DESKTOP ONLY) + MOTION + EVENTS -----
+function initDesktopLenis() {
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  if (typeof gsap !== 'undefined') {
-    if (typeof Lenis !== 'undefined' && window.matchMedia('(pointer: fine)').matches) {
+  const bootLenis = () => {
+    if (typeof Lenis !== 'undefined') {
       lenisInstance = new Lenis({
         duration: 1.25,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
         wheelMultiplier: 0.95,
       });
-      gsap.ticker.add((time) => {
-        lenisInstance.raf(time * 1000);
-      });
-      gsap.ticker.lagSmoothing(0);
+      const raf = (time) => {
+        lenisInstance.raf(time);
+        requestAnimationFrame(raf);
+      };
+      requestAnimationFrame(raf);
+      return;
     }
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js';
+    script.integrity = 'sha384-li4UtcFCH6QeUqR4JyV58/VgTprMuz9aauj+oWtew7V4Y7ZVjnvz5px9Y3UCG0Ea';
+    script.crossOrigin = 'anonymous';
+    script.onload = () => bootLenis();
+    document.head.appendChild(script);
+  };
 
-    initMagneticButtons();
-
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-    tl.from('.hero-line', { yPercent: 115, duration: 0.95, stagger: 0.14 })
-      .from('.hero-stagger', { y: 24, opacity: 0, duration: 0.7, stagger: 0.08 }, '-=0.5');
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(bootLenis, { timeout: 1500 });
+  } else {
+    setTimeout(bootLenis, 1000);
   }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  applyTheme(currentTheme);
+  updateBrief();
+  initMagneticButtons();
+  initDesktopLenis();
 
   // Batch below-the-fold IntersectionObserver & scroll progress setup in rAF after initial paint
   requestAnimationFrame(() => {
@@ -649,59 +562,98 @@ window.addEventListener('DOMContentLoaded', () => {
     trackEvent('theme_toggle', { theme: nextTheme });
   });
 
-  // Dynamic centered headline rotation with batched measurements
+  // Dynamic centered headline rotation (cached widths + GPU CSS transitions, zero GSAP/reflow)
   const swapSlot1 = document.getElementById('swapSlot1');
   const swapSlot2 = document.getElementById('swapSlot2');
-  let swapTimeline = null;
+  const swapOrder = ['swap-a', 'swap-b', 'swap-c'];
+  let swapIdx = 0;
+  let swapTimer = 0;
+  let swapStarted = false;
+  const cachedSwapWidths = {};
+
   const measureWord = (slot, cls) => {
     const el = slot ? slot.querySelector(`.${cls}`) : null;
     return el ? Math.ceil(el.getBoundingClientRect().width) + 2 : 0;
   };
-  const applySwapWidths = (cls) => {
-    const w1 = measureWord(swapSlot1, cls);
-    const w2 = measureWord(swapSlot2, cls);
-    if (swapSlot1) swapSlot1.style.width = `${w1}px`;
-    if (swapSlot2) swapSlot2.style.width = `${w2}px`;
-  };
-  requestAnimationFrame(() => applySwapWidths('swap-a'));
-
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && swapSlot1 && swapSlot2 && typeof gsap !== 'undefined') {
-    let activeCls = 'swap-a';
-    const runSwapInit = () => {
-      gsap.set('.swap-a', { yPercent: 0, opacity: 1 });
-      gsap.set('.swap-b, .swap-c', { yPercent: 110, opacity: 0 });
-      requestAnimationFrame(() => applySwapWidths('swap-a'));
-
-      swapTimeline = gsap.timeline({ repeat: -1, delay: 1.8 });
-      const addStep = (fromCls, toCls) => {
-        swapTimeline
-          .call(() => {
-            activeCls = toCls;
-            if (window.triggerAvatarBlink) window.triggerAvatarBlink();
-          })
-          .to(swapSlot1, { width: () => measureWord(swapSlot1, toCls), duration: 0.5, ease: 'power3.inOut' }, '<')
-          .to(swapSlot2, { width: () => measureWord(swapSlot2, toCls), duration: 0.5, ease: 'power3.inOut' }, '<')
-          .to(`.${fromCls}`, { yPercent: -110, opacity: 0, duration: 0.5, ease: 'power3.inOut' }, '<')
-          .fromTo(`.${toCls}`, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.52, ease: 'power3.out', immediateRender: false }, '<0.06')
-          .to({}, { duration: 1.8 });
+  const cacheAllSwapWidths = () => {
+    swapOrder.forEach((cls) => {
+      cachedSwapWidths[cls] = {
+        w1: measureWord(swapSlot1, cls),
+        w2: measureWord(swapSlot2, cls),
       };
-      addStep('swap-a', 'swap-b');
-      addStep('swap-b', 'swap-c');
-      addStep('swap-c', 'swap-a');
-      if (!isHeroVisible || document.hidden) swapTimeline.pause();
-    };
-
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(runSwapInit);
-    } else {
-      runSwapInit();
-    }
-    window.addEventListener('resize', () => {
-      applySwapWidths(activeCls);
     });
+    const cur = cachedSwapWidths[swapOrder[swapIdx]];
+    if (cur) {
+      if (swapSlot1 && cur.w1) swapSlot1.style.width = `${cur.w1}px`;
+      if (swapSlot2 && cur.w2) swapSlot2.style.width = `${cur.w2}px`;
+    }
+  };
+
+  requestAnimationFrame(cacheAllSwapWidths);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => requestAnimationFrame(cacheAllSwapWidths));
   }
 
-  // Visibility-aware 3D Solar-System Orbit Animation
+  const stepWordSwap = () => {
+    if (!isHeroVisible || document.hidden) return;
+    if (swapSlot1 && !swapSlot1.classList.contains('is-ready')) swapSlot1.classList.add('is-ready');
+    if (swapSlot2 && !swapSlot2.classList.contains('is-ready')) swapSlot2.classList.add('is-ready');
+    const prevCls = swapOrder[swapIdx];
+    swapIdx = (swapIdx + 1) % swapOrder.length;
+    const nextCls = swapOrder[swapIdx];
+
+    if (window.triggerAvatarBlink) window.triggerAvatarBlink();
+
+    const nextWidths = cachedSwapWidths[nextCls];
+    if (nextWidths) {
+      if (swapSlot1 && nextWidths.w1) swapSlot1.style.width = `${nextWidths.w1}px`;
+      if (swapSlot2 && nextWidths.w2) swapSlot2.style.width = `${nextWidths.w2}px`;
+    }
+
+    const prevWords = document.querySelectorAll(`.${prevCls}`);
+    const nextWords = document.querySelectorAll(`.${nextCls}`);
+    prevWords.forEach((el) => {
+      el.classList.remove('is-active');
+      el.classList.add('is-exit');
+    });
+    nextWords.forEach((el) => {
+      el.classList.remove('is-exit', 'is-no-anim');
+      el.classList.add('is-active');
+    });
+
+    setTimeout(() => {
+      prevWords.forEach((el) => el.classList.add('is-no-anim'));
+      prevWords.forEach((el) => el.classList.remove('is-exit'));
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          prevWords.forEach((el) => el.classList.remove('is-no-anim'));
+        });
+      });
+    }, 560);
+  };
+
+  const startSwapLoop = () => {
+    if (swapTimer || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !swapSlot1 || !swapSlot2) return;
+    swapTimer = setInterval(stepWordSwap, 2300);
+  };
+  const stopSwapLoop = () => {
+    if (!swapTimer) return;
+    clearInterval(swapTimer);
+    swapTimer = 0;
+  };
+
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && swapSlot1 && swapSlot2) {
+    setTimeout(() => {
+      swapStarted = true;
+      if (isHeroVisible && !document.hidden) {
+        stepWordSwap();
+        startSwapLoop();
+      }
+    }, 4500);
+    window.addEventListener('resize', () => requestAnimationFrame(cacheAllSwapWidths), { passive: true });
+  }
+
+  // Visibility-aware 3D Solar-System Orbit Animation (pure rAF, zero GSAP)
   const heroSection = document.getElementById('heroSection');
   const heroOrb = document.getElementById('heroOrb');
   const orbitLogos = Array.from(document.querySelectorAll('.orbit-logo'));
@@ -712,7 +664,18 @@ window.addEventListener('DOMContentLoaded', () => {
     const tiltA = -28 * (Math.PI / 180);
     const tiltB = 28 * (Math.PI / 180);
     let orbitElapsed = 0;
+    let lastOrbitTs = 0;
+    let orbitRafId = 0;
     let orbitR = 300 * 0.65;
+
+    const orbitItems = orbitLogos.map((el) => ({
+      el,
+      baseRad: (parseFloat(el.dataset.angle || '0') * Math.PI) / 180,
+      cosTiltZ: Math.cos(el.dataset.ring === 'a' ? tiltA : tiltB),
+      sinTiltZ: Math.sin(el.dataset.ring === 'a' ? tiltA : tiltB),
+      lastZ: '',
+    }));
+
     if ('ResizeObserver' in window) {
       new ResizeObserver((entries) => {
         const w = entries[0] && entries[0].contentRect && entries[0].contentRect.width;
@@ -724,50 +687,57 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const renderOrbit = (elapsed) => {
       const R = orbitR;
-      orbitLogos.forEach((el) => {
-        const isRingA = el.dataset.ring === 'a';
-        const baseDeg = parseFloat(el.dataset.angle || '0');
-        const theta = (baseDeg * Math.PI / 180) + elapsed * 0.34;
+      const invZScale = 1 / (R * cosX);
+      for (let i = 0; i < orbitItems.length; i++) {
+        const item = orbitItems[i];
+        const theta = item.baseRad + elapsed * 0.34;
+        const cosT = Math.cos(theta);
+        const sinT = Math.sin(theta);
 
-        const x0 = R * Math.cos(theta);
-        const y1 = R * Math.sin(theta) * sinX;
-        const z1 = R * Math.sin(theta) * cosX;
+        const x0 = R * cosT;
+        const y1 = R * sinT * sinX;
+        const z1 = R * sinT * cosX;
 
-        const tiltZ = isRingA ? tiltA : tiltB;
-        const x = x0 * Math.cos(tiltZ) - y1 * Math.sin(tiltZ);
-        const y = x0 * Math.sin(tiltZ) + y1 * Math.cos(tiltZ);
+        const x = x0 * item.cosTiltZ - y1 * item.sinTiltZ;
+        const y = x0 * item.sinTiltZ + y1 * item.cosTiltZ;
 
-        const depthNorm = z1 / (R * cosX);
+        const depthNorm = z1 * invZScale;
         const scale = 0.84 + (depthNorm + 1) * 0.16;
         const opacity = 0.65 + (depthNorm + 1) * 0.175;
+        const nextZ = z1 >= 0 ? '4' : '1';
 
-        el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-        el.style.opacity = opacity.toFixed(2);
-        el.style.zIndex = z1 >= 0 ? '4' : '1';
-      });
+        item.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+        item.el.style.opacity = opacity.toFixed(2);
+        if (item.lastZ !== nextZ) {
+          item.lastZ = nextZ;
+          item.el.style.zIndex = nextZ;
+        }
+      }
     };
 
-    const onOrbitTick = (_time, deltaTime) => {
-      orbitElapsed += Math.min(deltaTime || 16.67, 50) / 1000;
+    const onOrbitTick = (now) => {
+      if (!lastOrbitTs) lastOrbitTs = now;
+      orbitElapsed += Math.min(now - lastOrbitTs, 50) / 1000;
+      lastOrbitTs = now;
       renderOrbit(orbitElapsed);
+      orbitRafId = requestAnimationFrame(onOrbitTick);
     };
 
-    let orbitRunning = false;
     const syncHeroActivity = () => {
       const active = isHeroVisible && !document.hidden;
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!prefersReduced && typeof gsap !== 'undefined') {
-        if (active && !orbitRunning) {
-          gsap.ticker.add(onOrbitTick);
-          orbitRunning = true;
-        } else if (!active && orbitRunning) {
-          gsap.ticker.remove(onOrbitTick);
-          orbitRunning = false;
+      if (!prefersReduced) {
+        if (active && !orbitRafId) {
+          lastOrbitTs = 0;
+          orbitRafId = requestAnimationFrame(onOrbitTick);
+        } else if (!active && orbitRafId) {
+          cancelAnimationFrame(orbitRafId);
+          orbitRafId = 0;
         }
       }
-      if (swapTimeline) {
-        if (active) swapTimeline.resume();
-        else swapTimeline.pause();
+      if (swapStarted) {
+        if (active) startSwapLoop();
+        else stopSwapLoop();
       }
     };
 
@@ -785,16 +755,28 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Initialize Native WebGL Avatar
-  initWebGLAvatar();
+  // Initialize lightweight 2D eye-blink overlay
+  initAvatarBlink();
 
-  // Cursor spotlight (skipped on touch devices)
-  if (!window.matchMedia('(hover: none)').matches && typeof gsap !== 'undefined') {
+  // Cursor spotlight (skipped on touch devices, compositor transform only)
+  if (!window.matchMedia('(hover: none)').matches) {
     const glow = document.getElementById('cursorGlow');
-    window.addEventListener('mousemove', (e) => {
-      glow.style.opacity = '1';
-      gsap.to(glow, { x: e.clientX, y: e.clientY, duration: 0.35, ease: 'power2.out' });
-    });
+    if (glow) {
+      let gx = 0;
+      let gy = 0;
+      let glowRaf = 0;
+      window.addEventListener('mousemove', (e) => {
+        gx = e.clientX;
+        gy = e.clientY;
+        if (!glowRaf) {
+          glowRaf = requestAnimationFrame(() => {
+            glowRaf = 0;
+            glow.style.opacity = '1';
+            glow.style.transform = `translate3d(${gx}px, ${gy}px, 0) translate(-50%, -50%)`;
+          });
+        }
+      }, { passive: true });
+    }
   }
 
   // Mobile menu

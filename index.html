@@ -174,9 +174,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" /></noscript>
+  <link rel="preload" as="image" href="./avatar.webp" type="image/webp" fetchpriority="high" />
   <link rel="stylesheet" href="./styles.css" />
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" integrity="sha384-li4UtcFCH6QeUqR4JyV58/VgTprMuz9aauj+oWtew7V4Y7ZVjnvz5px9Y3UCG0Ea" crossorigin="anonymous"></script>
   <script defer src="./app.js"></script>
 </head>
 <body class="antialiased">
@@ -323,7 +322,10 @@
                 </svg>
               </div>
               <div class="orb-core">
-                <canvas id="avatarCanvas" aria-label="Interactive 3D character of Md. Sameer Sakib"></canvas>
+                <div class="avatar-frame">
+                  <img id="avatarImg" src="./avatar.webp" alt="Interactive 3D character of Md. Sameer Sakib" width="768" height="768" fetchpriority="high" decoding="async" onerror="this.onerror=null;this.src='./avatar.png';" />
+                  <canvas id="avatarBlinkCanvas" aria-hidden="true"></canvas>
+                </div>
               </div>
             </div>
           </div>
@@ -333,10 +335,10 @@
             <h1 class="font-display font-bold tracking-tight text-[clamp(1.85rem,7.8vw,4.25rem)] leading-[1.14] theme-text">
               <span class="sr-only">I Build Your Software, Scale Your Brand, and Run Your Ads</span>
               <span aria-hidden="true" class="line-mask block">
-                <span class="hero-line hero-grid-line"><span>I&nbsp;</span><span id="swapSlot1" class="swap-slot"><span class="swap-word swap-a">Build</span><span class="swap-word swap-b">Scale</span><span class="swap-word swap-c">Run</span></span></span>
+                <span class="hero-line hero-grid-line"><span>I&nbsp;</span><span id="swapSlot1" class="swap-slot"><span class="swap-word swap-a is-active">Build</span><span class="swap-word swap-b">Scale</span><span class="swap-word swap-c">Run</span></span></span>
               </span>
               <span aria-hidden="true" class="line-mask block">
-                <span class="hero-line hero-grid-line"><span>Your&nbsp;</span><span id="swapSlot2" class="swap-slot theme-accent-text"><span class="swap-word swap-a">Software</span><span class="swap-word swap-b">Brand</span><span class="swap-word swap-c">Ads</span></span></span>
+                <span class="hero-line hero-grid-line"><span>Your&nbsp;</span><span id="swapSlot2" class="swap-slot theme-accent-text"><span class="swap-word swap-a is-active">Software</span><span class="swap-word swap-b">Brand</span><span class="swap-word swap-c">Ads</span></span></span>
               </span>
             </h1>
 
