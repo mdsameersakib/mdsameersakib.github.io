@@ -1,0 +1,32 @@
+# Md. Sameer Sakib
+
+> Software Engineer & Performance Marketer based in Dhaka, Bangladesh (serving Bangladesh & worldwide). I build fast websites, e-commerce stores, and custom business software (CRM, ERP, HR, POS), configure browser & server-side tracking (Pixel, CAPI, GA4), and manage Meta, Google, and TikTok ad campaigns—all in one place.
+
+## Core Services
+
+### Software & Web Engineering
+- **Bespoke Websites & Online Stores:** Custom conversion landing pages, marketing websites, and e-commerce stores (Next.js, Shopify, WordPress).
+- **Custom Business Software (Buy Outright or SaaS):** Tailored CRM, ERP, HR, POS, and internal workflow tools.
+- **Existing Site Upgrades:** UI improvements, speed optimization, and new feature development without a full rebuild.
+
+### Performance Marketing & Tracking
+- **Paid Ads Management:** Meta Ads (Facebook & Instagram), Google Ads, and TikTok Ads structured and optimized daily for profitable leads and orders.
+- **Server-Side Tracking & Attribution:** Meta Pixel, Conversions API (CAPI), and Google Analytics 4 setup so ad algorithms receive accurate purchase and lead signals.
+- **Creative Testing & Scaling:** Ongoing ad creative iteration, funnel optimization, and weekly performance reporting.
+
+## Highlighted Case-Study Benchmarks (Best 2-Month Client Period)
+- **8.95x ROAS** peak month (7.56x average across 2 months)
+- **+74% Sales** over 2 months (+101% revenue jump in peak month)
+- **+67% Orders** completed (+95% monthly online order increase)
+- **5.8M Views** across Facebook (+267.2%) and Instagram (+116.7%)
+- **45.2K Link Clicks** and 162.3K site visits
+
+*Note: Benchmarks reflect top achieved client performance and vary by product, ad spend, and market.*
+
+## Background & Contact
+- **Education:** B.Sc. in Computer Science, BRAC University
+- **Website:** https://mdsameersakib.pro.bd/
+- **WhatsApp:** https://wa.me/mdsameersakib (@mdsameersakib)
+- **Email:** mdsameersakib@gmail.com
+- **GitHub:** https://github.com/mdsameersakib
+- **LinkedIn:** https://linkedin.com/in/mdsameersakib
