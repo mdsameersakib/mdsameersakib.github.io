@@ -24,9 +24,8 @@
 *Note: Benchmarks reflect top achieved client performance and vary by product, ad spend, and market.*
 
 ## Background & Contact
-- **Education:** B.Sc. in Computer Science, BRAC University
-- **Website:** https://mdsameersakib.pro.bd/
-- **WhatsApp:** https://wa.me/mdsameersakib (@mdsameersakib)
-- **Email:** mdsameersakib@gmail.com
-- **GitHub:** https://github.com/mdsameersakib
-- **LinkedIn:** https://linkedin.com/in/mdsameersakib
+- [Portfolio Website](https://mdsameersakib.pro.bd/) — Main portfolio & project brief builder
+- [WhatsApp (@mdsameersakib)](https://wa.me/mdsameersakib) — Direct project inquiries
+- [Email (mdsameersakib@gmail.com)](mailto:mdsameersakib@gmail.com) — Email brief & consulting
+- [GitHub Profile](https://github.com/mdsameersakib) — Open-source code & systems
+- [LinkedIn Profile](https://linkedin.com/in/mdsameersakib) — B.Sc. CS (BRAC University) & background
