@@ -1,7 +1,7 @@
 // ----- ANALYTICS & META PIXEL CONFIG (LOADS ONLY WITH REAL IDS) -----
 const TRACKING_CONFIG = {
   GA4_ID: 'G-XXXXXXXXXX',          // Replace with Google Analytics 4 Measurement ID
-  CLARITY_ID: 'XXXXXXXXXX',        // Replace with Microsoft Clarity Project ID
+  CLARITY_ID: 'zk726pagau',        // Microsoft Clarity Project ID
   META_PIXEL_ID: '000000000000000' // Replace with Meta Pixel ID
 };
 
